@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.config.AppConfig;
-import tr.unvercanunlu.ride_share.core.BaseDao;
-import tr.unvercanunlu.ride_share.dao.IRideDao;
+import tr.unvercanunlu.ride_share.core.InMemoryDao;
+import tr.unvercanunlu.ride_share.dao.IRideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
-public class RideDao extends BaseDao<Ride> implements IRideDao {
+public class RideRepository extends InMemoryDao<Ride> implements IRideRepository {
 
   @Override
   public List<Ride> getRequestedRidesBetweenGap(LocalDateTime gapStart, LocalDateTime gapEnd) {

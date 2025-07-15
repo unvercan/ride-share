@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public abstract class BaseDao<T extends BaseEntity<UUID>> implements IDao<T, UUID> {
+public abstract class InMemoryDao<T extends BaseEntity<UUID>> implements IDao<T, UUID> {
 
   protected final ConcurrentMap<UUID, T> entities = new ConcurrentHashMap<>();
 

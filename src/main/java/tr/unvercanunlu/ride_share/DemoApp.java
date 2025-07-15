@@ -2,12 +2,12 @@ package tr.unvercanunlu.ride_share;
 
 import java.util.List;
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dao.IDriverDao;
-import tr.unvercanunlu.ride_share.dao.IPassengerDao;
-import tr.unvercanunlu.ride_share.dao.IRideDao;
-import tr.unvercanunlu.ride_share.dao.impl.DriverDao;
-import tr.unvercanunlu.ride_share.dao.impl.PassengerDao;
-import tr.unvercanunlu.ride_share.dao.impl.RideDao;
+import tr.unvercanunlu.ride_share.dao.IDriverRepository;
+import tr.unvercanunlu.ride_share.dao.IPassengerRepository;
+import tr.unvercanunlu.ride_share.dao.IRideRepository;
+import tr.unvercanunlu.ride_share.dao.impl.DriverRepository;
+import tr.unvercanunlu.ride_share.dao.impl.PassengerRepository;
+import tr.unvercanunlu.ride_share.dao.impl.RideRepository;
 import tr.unvercanunlu.ride_share.dto.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
@@ -41,29 +41,28 @@ import tr.unvercanunlu.ride_share.service.impl.RideService;
 public class DemoApp {
 
   public static void main(String[] args) {
-    // DAOs
-    IDriverDao driverDao = new DriverDao();
-    IPassengerDao passengerDao = new PassengerDao();
-    IRideDao rideDao = new RideDao();
-    IMapService mapService = new MapService();
+    // Repositories
+    IDriverRepository driverRepository = new DriverRepository();
+    IPassengerRepository passengerRepository = new PassengerRepository();
+    IRideRepository rideRepository = new RideRepository();
 
     // Services
-    IDriverService driverService = new DriverService(driverDao, rideDao);
-    IPassengerService passengerService = new PassengerService(passengerDao);
-    IRideService rideService = new RideService(rideDao, driverDao, passengerDao, mapService);
+    IMapService mapService = new MapService();
+    IDriverService driverService = new DriverService(driverRepository, rideRepository);
+    IPassengerService passengerService = new PassengerService(passengerRepository);
+    IRideService rideService = new RideService(rideRepository, driverRepository, passengerRepository, mapService);
 
     // === DRIVER SERVICE ===
     System.out.println("=== DRIVER SERVICE DEMO ===");
 
     // Register Driver
-    Driver driver = driverService.register(new RegisterDriverDto("Alice", "alice@mail.com", "123456", "AAA-111"));
+    RegisterDriverDto registerDriverDto = new RegisterDriverDto("Alice", "alice@mail.com", "123456", "AAA-111");
+    Driver driver = driverService.register(registerDriverDto);
     System.out.println("Registered driver: " + driver.getId());
 
     // Update Location (valid)
-    Location loc = new Location();
-    loc.setLatitude(10.0);
-    loc.setLongitude(20.0);
-    driverService.updateLocation(driver.getId(), loc);
+    Location current = new Location(10.0, 20.0);
+    driverService.updateLocation(driver.getId(), current);
 
     // Make driver available
     driverService.makeAvailable(driver.getId());
@@ -71,7 +70,7 @@ public class DemoApp {
 
     // Try to update location for non-existent driver
     try {
-      driverService.updateLocation(UUID.randomUUID(), loc);
+      driverService.updateLocation(UUID.randomUUID(), current);
     } catch (DriverNotFoundException ex) {
       System.out.println("Caught expected: " + ex.getMessage());
     }
@@ -90,7 +89,8 @@ public class DemoApp {
     // === PASSENGER SERVICE ===
     System.out.println("\n=== PASSENGER SERVICE DEMO ===");
 
-    Passenger passenger = passengerService.register(new RegisterPassengerDto("Bob", "bob@mail.com", "654321"));
+    RegisterPassengerDto registerPassengerDto = new RegisterPassengerDto("Bob", "bob@mail.com", "654321");
+    Passenger passenger = passengerService.register(registerPassengerDto);
     System.out.println("Registered passenger: " + passenger.getId());
 
     // Get detail
@@ -111,44 +111,44 @@ public class DemoApp {
     driverService.makeAvailable(driver.getId());
 
     // Prepare pickup/dropoff
-    Location pickup = new Location();
-    pickup.setLatitude(10.1);
-    pickup.setLongitude(20.1);
-    Location dropoff = new Location();
-    dropoff.setLatitude(10.5);
-    dropoff.setLongitude(20.7);
+    Location pickup = new Location(10.1, 20.1);
+    Location dropOff = new Location(10.5, 20.7);
 
     // Passenger requests a ride
-    RideRequestedDto requested = rideService.request(new RequestRideDto(passenger.getId(), pickup, dropoff));
+    RequestRideDto requestRideDto = new RequestRideDto(passenger.getId(), pickup, dropOff);
+    RideRequestedDto requested = rideService.request(requestRideDto);
     System.out.println("Ride requested: " + requested.id());
 
     // Try to request another ride for same passenger (should throw PassengerHasActiveRideException)
     try {
-      rideService.request(new RequestRideDto(passenger.getId(), pickup, dropoff));
+      RequestRideDto requestRideDtoForPassengerActiveRide = new RequestRideDto(passenger.getId(), pickup, dropOff);
+      rideService.request(requestRideDtoForPassengerActiveRide);
     } catch (PassengerHasActiveRideException ex) {
       System.out.println("Caught expected: " + ex.getMessage());
     }
 
     // Find nearest requested rides (should include our ride)
-    List<NearRequestedRideDto> nearby = rideService.findNearestRequestedRides(loc);
+    List<NearRequestedRideDto> nearby = rideService.findNearestRequestedRides(current);
     System.out.println("Nearby requested rides: " + nearby.size());
 
     // Accept the ride
-    AcceptRideDto acceptDto = new AcceptRideDto(requested.id(), driver.getId(), loc);
+    AcceptRideDto acceptDto = new AcceptRideDto(requested.id(), driver.getId(), current);
     RideAcceptedDto accepted = rideService.accept(acceptDto);
     System.out.println("Ride accepted by driver: " + accepted.driverId());
 
     // Try to accept ride with unavailable driver (should throw DriverUnavailableException)
     try {
       // Driver is already BUSY after accepting above!
-      rideService.accept(new AcceptRideDto(requested.id(), driver.getId(), loc));
+      AcceptRideDto acceptRideDtoForDriverUnavailable = new AcceptRideDto(requested.id(), driver.getId(), current);
+      rideService.accept(acceptRideDtoForDriverUnavailable);
     } catch (DriverUnavailableException ex) {
       System.out.println("Caught expected: " + ex.getMessage());
     }
 
     // Try to accept with random driver (should throw DriverNotFoundException)
     try {
-      rideService.accept(new AcceptRideDto(requested.id(), UUID.randomUUID(), loc));
+      AcceptRideDto acceptRideDtoForDriverNotFound = new AcceptRideDto(requested.id(), UUID.randomUUID(), current);
+      rideService.accept(acceptRideDtoForDriverNotFound);
     } catch (DriverNotFoundException ex) {
       System.out.println("Caught expected: " + ex.getMessage());
     }
@@ -171,7 +171,7 @@ public class DemoApp {
     // Try to complete ride with missing driver (simulate by manually setting driverId to null)
     Ride ride = rideService.getDetail(requested.id());
     ride.setDriverId(null);
-    ((RideDao) rideDao).save(ride); // Save the change
+    rideRepository.save(ride); // Save the change
 
     try {
       rideService.complete(requested.id());
@@ -181,8 +181,9 @@ public class DemoApp {
 
     // Cancel a ride (first, create new ride)
     driverService.makeAvailable(driver.getId());
-    RideRequestedDto toCancel = rideService.request(new RequestRideDto(passenger.getId(), pickup, dropoff));
-    AcceptRideDto acceptToCancel = new AcceptRideDto(toCancel.id(), driver.getId(), loc);
+    RequestRideDto requestRideDtoToCancel = new RequestRideDto(passenger.getId(), pickup, dropOff);
+    RideRequestedDto toCancel = rideService.request(requestRideDtoToCancel);
+    AcceptRideDto acceptToCancel = new AcceptRideDto(toCancel.id(), driver.getId(), current);
     rideService.accept(acceptToCancel);
 
     RideCanceledDto canceled = rideService.cancel(toCancel.id());
@@ -225,8 +226,10 @@ public class DemoApp {
 
     // Try to make offline while driver has active ride (should throw)
     driverService.makeAvailable(driver.getId());
-    RideRequestedDto rideForActive = rideService.request(new RequestRideDto(passenger.getId(), pickup, dropoff));
-    rideService.accept(new AcceptRideDto(rideForActive.id(), driver.getId(), loc));
+    RequestRideDto requestRideDtoForActiveRideOfDriver = new RequestRideDto(passenger.getId(), pickup, dropOff);
+    RideRequestedDto rideForActive = rideService.request(requestRideDtoForActiveRideOfDriver);
+    AcceptRideDto acceptRideDtoForActiveRideOfDriver = new AcceptRideDto(rideForActive.id(), driver.getId(), current);
+    rideService.accept(acceptRideDtoForActiveRideOfDriver);
     try {
       driverService.makeOffline(driver.getId());
     } catch (DriverHasActiveRideException ex) {

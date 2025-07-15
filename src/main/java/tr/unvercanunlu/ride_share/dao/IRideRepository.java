@@ -6,7 +6,7 @@ import java.util.UUID;
 import tr.unvercanunlu.ride_share.core.IDao;
 import tr.unvercanunlu.ride_share.entity.Ride;
 
-public interface IRideDao extends IDao<Ride, UUID> {
+public interface IRideRepository extends IDao<Ride, UUID> {
 
   List<Ride> getRequestedRidesBetweenGap(LocalDateTime gapStart, LocalDateTime gapEnd);
 

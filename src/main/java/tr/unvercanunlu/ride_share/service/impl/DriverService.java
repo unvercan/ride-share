@@ -1,8 +1,8 @@
 package tr.unvercanunlu.ride_share.service.impl;
 
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dao.IDriverDao;
-import tr.unvercanunlu.ride_share.dao.IRideDao;
+import tr.unvercanunlu.ride_share.dao.IDriverRepository;
+import tr.unvercanunlu.ride_share.dao.IRideRepository;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.entity.Location;
@@ -13,12 +13,15 @@ import tr.unvercanunlu.ride_share.status.DriverStatus;
 
 public class DriverService implements IDriverService {
 
-  private final IDriverDao driverDao;
-  private final IRideDao rideDao;
+  private final IDriverRepository driverRepository;
+  private final IRideRepository rideRepository;
 
-  public DriverService(IDriverDao driverDao, IRideDao rideDao) {
-    this.driverDao = driverDao;
-    this.rideDao = rideDao;
+  public DriverService(
+      IDriverRepository driverRepository,
+      IRideRepository rideRepository
+  ) {
+    this.driverRepository = driverRepository;
+    this.rideRepository = rideRepository;
   }
 
   @Override
@@ -31,46 +34,46 @@ public class DriverService implements IDriverService {
     driver.setPlate(request.plate());
     driver.setStatus(DriverStatus.OFFLINE);
 
-    return driverDao.save(driver);
+    return driverRepository.save(driver);
   }
 
   @Override
   public Driver updateLocation(UUID driverId, Location current) throws DriverNotFoundException {
-    Driver driver = driverDao.get(driverId)
+    Driver driver = driverRepository.get(driverId)
         .orElseThrow(() -> new DriverNotFoundException(driverId));
 
     driver.setCurrent(current);
 
-    return driverDao.save(driver);
+    return driverRepository.save(driver);
   }
 
   @Override
   public Driver makeOffline(UUID driverId) throws DriverNotFoundException, DriverHasActiveRideException {
-    Driver driver = driverDao.get(driverId)
+    Driver driver = driverRepository.get(driverId)
         .orElseThrow(() -> new DriverNotFoundException(driverId));
 
-    if (rideDao.checkActiveRideForDriver(driverId)) {
+    if (rideRepository.checkActiveRideForDriver(driverId)) {
       throw new DriverHasActiveRideException(driverId);
     }
 
     driver.setStatus(DriverStatus.OFFLINE);
 
-    return driverDao.save(driver);
+    return driverRepository.save(driver);
   }
 
   @Override
   public Driver makeAvailable(UUID driverId) throws DriverNotFoundException {
-    Driver driver = driverDao.get(driverId)
+    Driver driver = driverRepository.get(driverId)
         .orElseThrow(() -> new DriverNotFoundException(driverId));
 
     driver.setStatus(DriverStatus.AVAILABLE);
 
-    return driverDao.save(driver);
+    return driverRepository.save(driver);
   }
 
   @Override
   public Driver getDetail(UUID driverId) throws DriverNotFoundException {
-    return driverDao.get(driverId)
+    return driverRepository.get(driverId)
         .orElseThrow(() -> new DriverNotFoundException(driverId));
   }
 
