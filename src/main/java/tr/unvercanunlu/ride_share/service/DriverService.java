@@ -7,7 +7,7 @@ import tr.unvercanunlu.ride_share.entity.Location;
 import tr.unvercanunlu.ride_share.exception.DriverHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
 
-public interface IDriverService {
+public interface DriverService {
 
   Driver register(RegisterDriverDto request);
 

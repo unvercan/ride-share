@@ -19,7 +19,7 @@ import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
 
-public interface IRideService {
+public interface RideService {
 
   RideRequestedDto request(RequestRideDto request)
       throws PassengerNotFoundException, PassengerHasActiveRideException;

@@ -5,7 +5,7 @@ import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 
-public interface IPassengerService {
+public interface PassengerService {
 
   Passenger register(RegisterPassengerDto request);
 

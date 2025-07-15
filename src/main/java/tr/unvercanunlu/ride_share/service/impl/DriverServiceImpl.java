@@ -1,24 +1,24 @@
 package tr.unvercanunlu.ride_share.service.impl;
 
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dao.IDriverRepository;
-import tr.unvercanunlu.ride_share.dao.IRideRepository;
+import tr.unvercanunlu.ride_share.dao.DriverRepository;
+import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.entity.Location;
 import tr.unvercanunlu.ride_share.exception.DriverHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
-import tr.unvercanunlu.ride_share.service.IDriverService;
+import tr.unvercanunlu.ride_share.service.DriverService;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 
-public class DriverService implements IDriverService {
+public class DriverServiceImpl implements DriverService {
 
-  private final IDriverRepository driverRepository;
-  private final IRideRepository rideRepository;
+  private final DriverRepository driverRepository;
+  private final RideRepository rideRepository;
 
-  public DriverService(
-      IDriverRepository driverRepository,
-      IRideRepository rideRepository
+  public DriverServiceImpl(
+      DriverRepository driverRepository,
+      RideRepository rideRepository
   ) {
     this.driverRepository = driverRepository;
     this.rideRepository = rideRepository;

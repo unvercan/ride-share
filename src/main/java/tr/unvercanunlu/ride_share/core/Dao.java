@@ -2,7 +2,7 @@ package tr.unvercanunlu.ride_share.core;
 
 import java.util.Optional;
 
-public interface IDao<T, K> {
+public interface Dao<T, K> {
 
   // retrieve
   Optional<T> get(K id);

@@ -2,12 +2,12 @@ package tr.unvercanunlu.ride_share;
 
 import java.util.List;
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dao.IDriverRepository;
-import tr.unvercanunlu.ride_share.dao.IPassengerRepository;
-import tr.unvercanunlu.ride_share.dao.IRideRepository;
-import tr.unvercanunlu.ride_share.dao.impl.DriverRepository;
-import tr.unvercanunlu.ride_share.dao.impl.PassengerRepository;
-import tr.unvercanunlu.ride_share.dao.impl.RideRepository;
+import tr.unvercanunlu.ride_share.dao.DriverRepository;
+import tr.unvercanunlu.ride_share.dao.PassengerRepository;
+import tr.unvercanunlu.ride_share.dao.RideRepository;
+import tr.unvercanunlu.ride_share.dao.impl.DriverRepositoryImpl;
+import tr.unvercanunlu.ride_share.dao.impl.PassengerRepositoryImpl;
+import tr.unvercanunlu.ride_share.dao.impl.RideRepositoryImpl;
 import tr.unvercanunlu.ride_share.dto.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
@@ -29,28 +29,28 @@ import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
 import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
-import tr.unvercanunlu.ride_share.service.IDriverService;
-import tr.unvercanunlu.ride_share.service.IMapService;
-import tr.unvercanunlu.ride_share.service.IPassengerService;
-import tr.unvercanunlu.ride_share.service.IRideService;
-import tr.unvercanunlu.ride_share.service.impl.DriverService;
-import tr.unvercanunlu.ride_share.service.impl.MapService;
-import tr.unvercanunlu.ride_share.service.impl.PassengerService;
-import tr.unvercanunlu.ride_share.service.impl.RideService;
+import tr.unvercanunlu.ride_share.service.DriverService;
+import tr.unvercanunlu.ride_share.service.MapService;
+import tr.unvercanunlu.ride_share.service.PassengerService;
+import tr.unvercanunlu.ride_share.service.RideService;
+import tr.unvercanunlu.ride_share.service.impl.DriverServiceImpl;
+import tr.unvercanunlu.ride_share.service.impl.MapServiceImpl;
+import tr.unvercanunlu.ride_share.service.impl.PassengerServiceImpl;
+import tr.unvercanunlu.ride_share.service.impl.RideServiceImpl;
 
 public class DemoApp {
 
   public static void main(String[] args) {
     // Repositories
-    IDriverRepository driverRepository = new DriverRepository();
-    IPassengerRepository passengerRepository = new PassengerRepository();
-    IRideRepository rideRepository = new RideRepository();
+    DriverRepository driverRepository = new DriverRepositoryImpl();
+    PassengerRepository passengerRepository = new PassengerRepositoryImpl();
+    RideRepository rideRepository = new RideRepositoryImpl();
 
     // Services
-    IMapService mapService = new MapService();
-    IDriverService driverService = new DriverService(driverRepository, rideRepository);
-    IPassengerService passengerService = new PassengerService(passengerRepository);
-    IRideService rideService = new RideService(rideRepository, driverRepository, passengerRepository, mapService);
+    MapService mapService = new MapServiceImpl();
+    DriverService driverService = new DriverServiceImpl(driverRepository, rideRepository);
+    PassengerService passengerService = new PassengerServiceImpl(passengerRepository);
+    RideService rideService = new RideServiceImpl(rideRepository, driverRepository, passengerRepository, mapService);
 
     // === DRIVER SERVICE ===
     System.out.println("=== DRIVER SERVICE DEMO ===");

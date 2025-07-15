@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.config.AppConfig;
-import tr.unvercanunlu.ride_share.dao.IDriverRepository;
-import tr.unvercanunlu.ride_share.dao.IPassengerRepository;
-import tr.unvercanunlu.ride_share.dao.IRideRepository;
+import tr.unvercanunlu.ride_share.dao.DriverRepository;
+import tr.unvercanunlu.ride_share.dao.PassengerRepository;
+import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.dto.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
@@ -29,23 +29,23 @@ import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
 import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
-import tr.unvercanunlu.ride_share.service.IMapService;
-import tr.unvercanunlu.ride_share.service.IRideService;
+import tr.unvercanunlu.ride_share.service.MapService;
+import tr.unvercanunlu.ride_share.service.RideService;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
-public class RideService implements IRideService {
+public class RideServiceImpl implements RideService {
 
-  private final IRideRepository rideRepository;
-  private final IDriverRepository driverRepository;
-  private final IPassengerRepository passengerRepository;
-  private final IMapService mapService;
+  private final RideRepository rideRepository;
+  private final DriverRepository driverRepository;
+  private final PassengerRepository passengerRepository;
+  private final MapService mapService;
 
-  public RideService(
-      IRideRepository rideRepository,
-      IDriverRepository driverRepository,
-      IPassengerRepository passengerRepository,
-      IMapService mapService
+  public RideServiceImpl(
+      RideRepository rideRepository,
+      DriverRepository driverRepository,
+      PassengerRepository passengerRepository,
+      MapService mapService
   ) {
     this.rideRepository = rideRepository;
     this.driverRepository = driverRepository;

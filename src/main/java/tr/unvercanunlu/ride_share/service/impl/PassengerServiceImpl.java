@@ -1,17 +1,17 @@
 package tr.unvercanunlu.ride_share.service.impl;
 
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dao.IPassengerRepository;
+import tr.unvercanunlu.ride_share.dao.PassengerRepository;
 import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
-import tr.unvercanunlu.ride_share.service.IPassengerService;
+import tr.unvercanunlu.ride_share.service.PassengerService;
 
-public class PassengerService implements IPassengerService {
+public class PassengerServiceImpl implements PassengerService {
 
-  private final IPassengerRepository passengerRepository;
+  private final PassengerRepository passengerRepository;
 
-  public PassengerService(IPassengerRepository passengerRepository) {
+  public PassengerServiceImpl(PassengerRepository passengerRepository) {
     this.passengerRepository = passengerRepository;
   }
 

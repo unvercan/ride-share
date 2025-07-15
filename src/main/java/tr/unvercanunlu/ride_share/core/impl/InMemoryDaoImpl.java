@@ -1,11 +1,13 @@
-package tr.unvercanunlu.ride_share.core;
+package tr.unvercanunlu.ride_share.core.impl;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import tr.unvercanunlu.ride_share.core.BaseEntity;
+import tr.unvercanunlu.ride_share.core.Dao;
 
-public abstract class InMemoryDao<T extends BaseEntity<UUID>> implements IDao<T, UUID> {
+public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao<T, UUID> {
 
   protected final ConcurrentMap<UUID, T> entities = new ConcurrentHashMap<>();
 
