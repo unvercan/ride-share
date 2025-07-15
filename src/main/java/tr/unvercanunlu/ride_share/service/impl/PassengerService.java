@@ -1,6 +1,5 @@
 package tr.unvercanunlu.ride_share.service.impl;
 
-import java.util.Optional;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.dao.IPassengerDao;
 import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
@@ -29,9 +28,8 @@ public class PassengerService implements IPassengerService {
 
   @Override
   public Passenger getDetail(UUID passengerId) throws PassengerNotFoundException {
-    return Optional.ofNullable(
-        passengerDao.get(passengerId)
-    ).orElseThrow(() -> new PassengerNotFoundException(passengerId));
+    return passengerDao.get(passengerId)
+        .orElseThrow(() -> new PassengerNotFoundException(passengerId));
   }
 
 }

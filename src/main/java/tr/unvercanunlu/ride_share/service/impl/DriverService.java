@@ -1,11 +1,8 @@
 package tr.unvercanunlu.ride_share.service.impl;
 
-import java.util.Optional;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.dao.IDriverDao;
 import tr.unvercanunlu.ride_share.dao.IRideDao;
-import tr.unvercanunlu.ride_share.dao.impl.DriverDao;
-import tr.unvercanunlu.ride_share.dao.impl.RideDao;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.entity.Location;
@@ -39,9 +36,8 @@ public class DriverService implements IDriverService {
 
   @Override
   public Driver updateLocation(UUID driverId, Location current) throws DriverNotFoundException {
-    Driver driver = Optional.ofNullable(
-        driverDao.get(driverId)
-    ).orElseThrow(() -> new DriverNotFoundException(driverId));
+    Driver driver = driverDao.get(driverId)
+        .orElseThrow(() -> new DriverNotFoundException(driverId));
 
     driver.setCurrent(current);
 
@@ -50,9 +46,8 @@ public class DriverService implements IDriverService {
 
   @Override
   public Driver makeOffline(UUID driverId) throws DriverNotFoundException, DriverHasActiveRideException {
-    Driver driver = Optional.ofNullable(
-        driverDao.get(driverId)
-    ).orElseThrow(() -> new DriverNotFoundException(driverId));
+    Driver driver = driverDao.get(driverId)
+        .orElseThrow(() -> new DriverNotFoundException(driverId));
 
     if (rideDao.checkActiveRideForDriver(driverId)) {
       throw new DriverHasActiveRideException(driverId);
@@ -65,9 +60,8 @@ public class DriverService implements IDriverService {
 
   @Override
   public Driver makeAvailable(UUID driverId) throws DriverNotFoundException {
-    Driver driver = Optional.ofNullable(
-        driverDao.get(driverId)
-    ).orElseThrow(() -> new DriverNotFoundException(driverId));
+    Driver driver = driverDao.get(driverId)
+        .orElseThrow(() -> new DriverNotFoundException(driverId));
 
     driver.setStatus(DriverStatus.AVAILABLE);
 
@@ -76,9 +70,8 @@ public class DriverService implements IDriverService {
 
   @Override
   public Driver getDetail(UUID driverId) throws DriverNotFoundException {
-    return Optional.ofNullable(
-        driverDao.get(driverId)
-    ).orElseThrow(() -> new DriverNotFoundException(driverId));
+    return driverDao.get(driverId)
+        .orElseThrow(() -> new DriverNotFoundException(driverId));
   }
 
 }

@@ -1,5 +1,6 @@
 package tr.unvercanunlu.ride_share.core;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -9,8 +10,10 @@ public abstract class BaseDao<T extends BaseEntity<UUID>> implements IDao<T, UUI
   protected final ConcurrentMap<UUID, T> entities = new ConcurrentHashMap<>();
 
   @Override
-  public T get(UUID id) {
-    return entities.get(id);
+  public Optional<T> get(UUID id) {
+    return Optional.ofNullable(
+        entities.get(id)
+    );
   }
 
   @Override
