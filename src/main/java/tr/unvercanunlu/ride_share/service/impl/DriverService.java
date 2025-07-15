@@ -16,8 +16,13 @@ import tr.unvercanunlu.ride_share.status.DriverStatus;
 
 public class DriverService implements IDriverService {
 
-  private final IDriverDao driverDao = new DriverDao();
-  private final IRideDao rideDao = new RideDao();
+  private final IDriverDao driverDao;
+  private final IRideDao rideDao;
+
+  public DriverService(IDriverDao driverDao, IRideDao rideDao) {
+    this.driverDao = driverDao;
+    this.rideDao = rideDao;
+  }
 
   @Override
   public Driver register(RegisterDriverDto request) {

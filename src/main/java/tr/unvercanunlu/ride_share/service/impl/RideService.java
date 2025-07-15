@@ -40,10 +40,17 @@ import tr.unvercanunlu.ride_share.status.RideStatus;
 
 public class RideService implements IRideService {
 
-  private final IRideDao rideDao = new RideDao();
-  private final IDriverDao driverDao = new DriverDao();
-  private final IPassengerDao passengerDao = new PassengerDao();
-  private final IMapService mapService = new MapService();
+  private final IRideDao rideDao;
+  private final IDriverDao driverDao;
+  private final IPassengerDao passengerDao;
+  private final IMapService mapService;
+
+  public RideService(IRideDao rideDao, IDriverDao driverDao, IPassengerDao passengerDao, IMapService mapService) {
+    this.rideDao = rideDao;
+    this.driverDao = driverDao;
+    this.passengerDao = passengerDao;
+    this.mapService = mapService;
+  }
 
   @Override
   public RideRequestedDto request(RequestRideDto request) throws PassengerNotFoundException, PassengerHasActiveRideException {
