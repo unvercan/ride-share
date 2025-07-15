@@ -7,8 +7,8 @@ import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 
 public interface IPassengerService {
 
-  Passenger registerPassenger(RegisterPassengerDto request);
+  Passenger register(RegisterPassengerDto request);
 
-  Passenger getPassengerDetail(UUID passengerId) throws PassengerNotFoundException;
+  Passenger getDetail(UUID passengerId) throws PassengerNotFoundException;
 
 }

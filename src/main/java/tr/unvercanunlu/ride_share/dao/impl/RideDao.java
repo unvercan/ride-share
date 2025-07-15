@@ -3,6 +3,7 @@ package tr.unvercanunlu.ride_share.dao.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import tr.unvercanunlu.ride_share.config.AppConfig;
 import tr.unvercanunlu.ride_share.core.BaseDao;
 import tr.unvercanunlu.ride_share.dao.IRideDao;
 import tr.unvercanunlu.ride_share.entity.Ride;
@@ -23,7 +24,7 @@ public class RideDao extends BaseDao<Ride> implements IRideDao {
   public List<Ride> getByDriver(UUID driverId) {
     return entities.values()
         .stream()
-        .filter(ride -> ride.getDriverId().equals(driverId))
+        .filter(ride -> driverId.equals(ride.getDriverId()))
         .toList();
   }
 
@@ -31,8 +32,22 @@ public class RideDao extends BaseDao<Ride> implements IRideDao {
   public List<Ride> getByPassenger(UUID passengerId) {
     return entities.values()
         .stream()
-        .filter(ride -> ride.getPassengerId().equals(passengerId))
+        .filter(ride -> passengerId.equals(ride.getPassengerId()))
         .toList();
+  }
+
+  @Override
+  public boolean checkActiveRideForPassenger(UUID passengerId) {
+    return getByPassenger(passengerId)
+        .stream()
+        .anyMatch(ride -> AppConfig.ACTIVE_RIDE_STATUSES.contains(ride.getStatus()));
+  }
+
+  @Override
+  public boolean checkActiveRideForDriver(UUID driverId) {
+    return getByDriver(driverId)
+        .stream()
+        .anyMatch(ride -> AppConfig.ACTIVE_RIDE_STATUSES.contains(ride.getStatus()));
   }
 
 }

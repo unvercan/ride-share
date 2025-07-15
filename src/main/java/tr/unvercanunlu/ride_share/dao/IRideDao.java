@@ -14,4 +14,8 @@ public interface IRideDao extends IDao<Ride, UUID> {
 
   List<Ride> getByPassenger(UUID passengerId);
 
+  boolean checkActiveRideForPassenger(UUID passengerId);
+
+  boolean checkActiveRideForDriver(UUID driverId);
+
 }

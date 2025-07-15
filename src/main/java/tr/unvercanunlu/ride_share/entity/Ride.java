@@ -1,5 +1,6 @@
 package tr.unvercanunlu.ride_share.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class Ride extends BaseEntity<UUID> {
   private RideStatus status;
   private double distance;
   private int duration;
-  private double fare;
+  private BigDecimal fare;
   private LocalDateTime requestedAt;
   private LocalDateTime requestEndAt;
   private LocalDateTime acceptedAt;

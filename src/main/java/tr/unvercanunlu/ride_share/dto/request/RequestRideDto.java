@@ -9,5 +9,4 @@ public record RequestRideDto(
     Location dropOff
 ) {
 
-
 }

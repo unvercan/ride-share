@@ -9,7 +9,7 @@ public enum RideStatus {
 
   REQUESTED('R'),
   ACCEPTED('A'),
-  IN_PROGRESS('I'),
+  STARTED('S'),
   COMPLETED('C'),
   CANCELED('X');
 

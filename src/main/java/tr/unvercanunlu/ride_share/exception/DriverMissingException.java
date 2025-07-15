@@ -5,13 +5,13 @@ import java.util.UUID;
 import lombok.Getter;
 import tr.unvercanunlu.ride_share.config.ErrorMessage;
 
-public class RideNotFoundException extends RuntimeException {
+public class DriverMissingException extends RuntimeException {
 
   @Getter
   private final UUID id;
 
-  public RideNotFoundException(UUID rideId) {
-    super(ErrorMessage.RIDE_NOT_FOUND.formatted(Objects.toString(rideId, null)));
+  public DriverMissingException(UUID rideId) {
+    super(ErrorMessage.DRIVER_MISSING.formatted(Objects.toString(rideId, null)));
 
     this.id = rideId;
   }

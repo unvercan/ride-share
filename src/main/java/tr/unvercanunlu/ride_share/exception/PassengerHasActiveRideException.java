@@ -5,13 +5,13 @@ import java.util.UUID;
 import lombok.Getter;
 import tr.unvercanunlu.ride_share.config.ErrorMessage;
 
-public class PassengerNotFoundException extends RuntimeException {
+public class PassengerHasActiveRideException extends RuntimeException {
 
   @Getter
   private final UUID id;
 
-  public PassengerNotFoundException(UUID passengerId) {
-    super(ErrorMessage.PASSENGER_NOT_FOUND.formatted(Objects.toString(passengerId, null)));
+  public PassengerHasActiveRideException(UUID passengerId) {
+    super(ErrorMessage.PASSENGER_HAS_ACTIVE_RIDE.formatted(Objects.toString(passengerId, null)));
 
     this.id = passengerId;
   }

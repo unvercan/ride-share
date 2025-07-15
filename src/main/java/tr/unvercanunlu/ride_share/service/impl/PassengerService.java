@@ -14,7 +14,7 @@ public class PassengerService implements IPassengerService {
   private final IPassengerDao passengerDao = new PassengerDao();
 
   @Override
-  public Passenger registerPassenger(RegisterPassengerDto request) {
+  public Passenger register(RegisterPassengerDto request) {
     Passenger passenger = new Passenger();
     passenger.setId(UUID.randomUUID());
     passenger.setName(request.name());
@@ -25,7 +25,7 @@ public class PassengerService implements IPassengerService {
   }
 
   @Override
-  public Passenger getPassengerDetail(UUID passengerId) throws PassengerNotFoundException {
+  public Passenger getDetail(UUID passengerId) throws PassengerNotFoundException {
     return Optional.ofNullable(
         passengerDao.get(passengerId)
     ).orElseThrow(() -> new PassengerNotFoundException(passengerId));

@@ -1,5 +1,6 @@
 package tr.unvercanunlu.ride_share.dto.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.entity.Location;
@@ -11,7 +12,7 @@ public record PassengerPickupDto(
     Location pickup,
     Location dropOff,
     double distance,
-    double fare,
+    BigDecimal fare,
     LocalDateTime requestedAt,
     LocalDateTime acceptedAt,
     LocalDateTime pickupAt,
