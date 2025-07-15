@@ -18,7 +18,7 @@ public class Ride extends BaseEntity<UUID> {
   private Location dropOff;
   private RideStatus status;
   private double distance;
-  private int duration;
+  private long duration;
   private BigDecimal fare;
   private LocalDateTime requestedAt;
   private LocalDateTime requestEndAt;

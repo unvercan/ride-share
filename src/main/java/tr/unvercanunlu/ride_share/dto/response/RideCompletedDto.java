@@ -17,7 +17,7 @@ public record RideCompletedDto(
     LocalDateTime acceptedAt,
     LocalDateTime pickupAt,
     LocalDateTime completedAt,
-    int duration
+    long duration
 ) {
 
 }

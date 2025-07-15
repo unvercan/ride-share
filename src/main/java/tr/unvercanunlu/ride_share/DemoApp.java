@@ -29,12 +29,14 @@ import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
 import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
+import tr.unvercanunlu.ride_share.service.CalculationService;
 import tr.unvercanunlu.ride_share.service.DriverService;
-import tr.unvercanunlu.ride_share.service.MapService;
+import tr.unvercanunlu.ride_share.service.GeoService;
 import tr.unvercanunlu.ride_share.service.PassengerService;
 import tr.unvercanunlu.ride_share.service.RideService;
+import tr.unvercanunlu.ride_share.service.impl.CalculationServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.DriverServiceImpl;
-import tr.unvercanunlu.ride_share.service.impl.MapServiceImpl;
+import tr.unvercanunlu.ride_share.service.impl.GeoServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.PassengerServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.RideServiceImpl;
 
@@ -47,10 +49,11 @@ public class DemoApp {
     RideRepository rideRepository = new RideRepositoryImpl();
 
     // Services
-    MapService mapService = new MapServiceImpl();
+    GeoService geoService = new GeoServiceImpl();
     DriverService driverService = new DriverServiceImpl(driverRepository, rideRepository);
     PassengerService passengerService = new PassengerServiceImpl(passengerRepository);
-    RideService rideService = new RideServiceImpl(rideRepository, driverRepository, passengerRepository, mapService);
+    CalculationService calculationService = new CalculationServiceImpl();
+    RideService rideService = new RideServiceImpl(rideRepository, driverRepository, passengerRepository, geoService, calculationService);
 
     // === DRIVER SERVICE ===
     System.out.println("=== DRIVER SERVICE DEMO ===");

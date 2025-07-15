@@ -1,5 +1,7 @@
 package tr.unvercanunlu.ride_share.core.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,19 +21,28 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
   }
 
   @Override
-  public T save(T data) {
-    if (data.getId() == null) {
-      data.setId(UUID.randomUUID());
-    }
+  public List<T> getAll() {
+    return new ArrayList<>(entities.values());
+  }
 
-    entities.put(data.getId(), data);
+  @Override
+  public T save(T entity) {
+    ensureId(entity);
 
-    return data;
+    entities.put(entity.getId(), entity);
+
+    return entity;
   }
 
   @Override
   public void remove(UUID id) {
     entities.remove(id);
+  }
+
+  protected void ensureId(T entity) {
+    if (entity.getId() == null) {
+      entity.setId(UUID.randomUUID());
+    }
   }
 
 }

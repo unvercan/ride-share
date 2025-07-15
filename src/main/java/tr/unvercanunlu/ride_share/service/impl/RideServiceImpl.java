@@ -29,7 +29,8 @@ import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
 import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
-import tr.unvercanunlu.ride_share.service.MapService;
+import tr.unvercanunlu.ride_share.service.CalculationService;
+import tr.unvercanunlu.ride_share.service.GeoService;
 import tr.unvercanunlu.ride_share.service.RideService;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 import tr.unvercanunlu.ride_share.status.RideStatus;
@@ -39,18 +40,21 @@ public class RideServiceImpl implements RideService {
   private final RideRepository rideRepository;
   private final DriverRepository driverRepository;
   private final PassengerRepository passengerRepository;
-  private final MapService mapService;
+  private final GeoService geoService;
+  private final CalculationService calculationService;
 
   public RideServiceImpl(
       RideRepository rideRepository,
       DriverRepository driverRepository,
       PassengerRepository passengerRepository,
-      MapService mapService
+      GeoService geoService,
+      CalculationService calculationService
   ) {
     this.rideRepository = rideRepository;
     this.driverRepository = driverRepository;
     this.passengerRepository = passengerRepository;
-    this.mapService = mapService;
+    this.geoService = geoService;
+    this.calculationService = calculationService;
   }
 
   @Override
@@ -65,11 +69,9 @@ public class RideServiceImpl implements RideService {
     LocalDateTime requestedAt = LocalDateTime.now();
     LocalDateTime requestEndAt = requestedAt.plusMinutes(AppConfig.MAX_DURATION);
 
-    double distance = mapService.calculateDistance(request.pickup(), request.dropOff());
+    double distance = geoService.calculateDistance(request.pickup(), request.dropOff());
 
-    BigDecimal fare = BigDecimal.valueOf(
-        AppConfig.BASE_FARE + (distance * AppConfig.KM_RATE)
-    );
+    BigDecimal fare = calculationService.calculatePrice(distance);
 
     Ride ride = new Ride();
     ride.setId(UUID.randomUUID());
@@ -87,7 +89,7 @@ public class RideServiceImpl implements RideService {
     // estimations
     int estimatedDuration = -1;
     if (AppConfig.ESTIMATION) {
-      estimatedDuration = mapService.estimateDuration(request.pickup(), request.dropOff());
+      estimatedDuration = geoService.estimateDuration(request.pickup(), request.dropOff());
     }
 
     return new RideRequestedDto(
@@ -114,7 +116,7 @@ public class RideServiceImpl implements RideService {
     List<NearRequestedRideDto> nearRequestedRides = new ArrayList<>();
 
     for (Ride ride : requestedRides) {
-      double distanceToPickup = mapService.calculateDistance(ride.getPickup(), current);
+      double distanceToPickup = geoService.calculateDistance(ride.getPickup(), current);
 
       if (distanceToPickup > AppConfig.NEAR_DISTANCE) {
         continue;
@@ -127,10 +129,10 @@ public class RideServiceImpl implements RideService {
       int estimatedDuration = -1;
       LocalDateTime estimatedCompletedAt = null;
       if (AppConfig.ESTIMATION) {
-        estimatedDurationToPickup = mapService.estimateDuration(current, ride.getPickup());
+        estimatedDurationToPickup = geoService.estimateDuration(current, ride.getPickup());
         estimatedPickupAt = gapStart.plusMinutes(estimatedDurationToPickup);
         estimatedPickupEndAt = estimatedPickupAt.plusMinutes(AppConfig.MAX_DURATION);
-        estimatedDuration = mapService.estimateDuration(ride.getPickup(), ride.getDropOff());
+        estimatedDuration = geoService.estimateDuration(ride.getPickup(), ride.getDropOff());
         estimatedCompletedAt = estimatedPickupAt.plusMinutes(estimatedDuration);
       }
 
@@ -169,10 +171,7 @@ public class RideServiceImpl implements RideService {
     checkDriverSuitable(request.driverId());
 
     ride.setDriverId(request.driverId());
-
-    LocalDateTime acceptedAt = LocalDateTime.now();
-    ride.setAcceptedAt(acceptedAt);
-
+    ride.setAcceptedAt(LocalDateTime.now());
     ride.setStatus(RideStatus.ACCEPTED);
 
     ride = rideRepository.save(ride);
@@ -186,10 +185,10 @@ public class RideServiceImpl implements RideService {
     int estimatedDuration = -1;
     LocalDateTime estimatedCompletedAt = null;
     if (AppConfig.ESTIMATION) {
-      estimatedDurationToPickup = mapService.estimateDuration(request.current(), ride.getPickup());
-      estimatedPickupAt = acceptedAt.plusMinutes(estimatedDurationToPickup);
+      estimatedDurationToPickup = geoService.estimateDuration(request.current(), ride.getPickup());
+      estimatedPickupAt = ride.getAcceptedAt().plusMinutes(estimatedDurationToPickup);
       estimatedPickupEndAt = estimatedPickupAt.plusMinutes(AppConfig.MAX_DURATION);
-      estimatedDuration = mapService.estimateDuration(ride.getPickup(), ride.getDropOff());
+      estimatedDuration = geoService.estimateDuration(ride.getPickup(), ride.getDropOff());
       estimatedCompletedAt = estimatedPickupAt.plusMinutes(estimatedDuration);
     }
 
@@ -221,12 +220,8 @@ public class RideServiceImpl implements RideService {
       throw new DriverMissingException(rideId);
     }
 
-    LocalDateTime pickupAt = LocalDateTime.now();
-    ride.setPickupAt(pickupAt);
-
-    LocalDateTime pickupEndAt = pickupAt.plusMinutes(AppConfig.MAX_DURATION);
-    ride.setPickupEndAt(pickupEndAt);
-
+    ride.setPickupAt(LocalDateTime.now());
+    ride.setPickupEndAt(ride.getPickupAt().plusMinutes(AppConfig.MAX_DURATION));
     ride.setStatus(RideStatus.STARTED);
 
     ride = rideRepository.save(ride);
@@ -235,8 +230,8 @@ public class RideServiceImpl implements RideService {
     int estimatedDuration = -1;
     LocalDateTime estimatedCompletedAt = null;
     if (AppConfig.ESTIMATION) {
-      estimatedDuration = mapService.estimateDuration(ride.getPickup(), ride.getDropOff());
-      estimatedCompletedAt = pickupAt.plusMinutes(estimatedDuration);
+      estimatedDuration = geoService.estimateDuration(ride.getPickup(), ride.getDropOff());
+      estimatedCompletedAt = ride.getPickupAt().plusMinutes(estimatedDuration);
     }
 
     return new PassengerPickupDto(
@@ -268,12 +263,8 @@ public class RideServiceImpl implements RideService {
 
     setDriverAvailable(ride.getDriverId());
 
-    LocalDateTime completedAt = LocalDateTime.now();
-    ride.setCompletedAt(completedAt);
-
-    int duration = (int) Duration.between(ride.getPickupAt(), completedAt).toMinutes();
-    ride.setDuration(duration);
-
+    ride.setCompletedAt(LocalDateTime.now());
+    ride.setDuration(Duration.between(ride.getPickupAt(), ride.getCompletedAt()).toMinutes());
     ride.setStatus(RideStatus.COMPLETED);
 
     ride = rideRepository.save(ride);
@@ -290,7 +281,7 @@ public class RideServiceImpl implements RideService {
         ride.getAcceptedAt(),
         ride.getPickupAt(),
         ride.getCompletedAt(),
-        duration
+        ride.getDuration()
     );
   }
 
@@ -299,9 +290,7 @@ public class RideServiceImpl implements RideService {
     Ride ride = rideRepository.get(rideId)
         .orElseThrow(() -> new RideNotFoundException(rideId));
 
-    LocalDateTime canceledAt = LocalDateTime.now();
-
-    ride.setCanceledAt(canceledAt);
+    ride.setCanceledAt(LocalDateTime.now());
     ride.setStatus(RideStatus.CANCELED);
 
     ride = rideRepository.save(ride);
