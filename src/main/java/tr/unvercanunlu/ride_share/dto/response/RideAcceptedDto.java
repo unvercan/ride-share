@@ -15,12 +15,7 @@ public record RideAcceptedDto(
     BigDecimal fare,
     LocalDateTime requestedAt,
     LocalDateTime acceptedAt,
-
-    // estimations
-    int estimatedDuration,
-    LocalDateTime estimatedPickupAt,
-    LocalDateTime estimatedPickupEndAt,
-    LocalDateTime estimatedCompletedAt
+    Estimation estimation
 ) {
 
 }

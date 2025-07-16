@@ -6,4 +6,5 @@ import tr.unvercanunlu.ride_share.entity.Driver;
 
 public interface DriverRepository extends Dao<Driver, UUID> {
 
+  boolean checkDriverAvailable(UUID driverId);
 }

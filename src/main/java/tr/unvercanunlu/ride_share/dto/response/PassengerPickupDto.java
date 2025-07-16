@@ -16,10 +16,7 @@ public record PassengerPickupDto(
     LocalDateTime requestedAt,
     LocalDateTime acceptedAt,
     LocalDateTime pickupAt,
-
-    // estimations
-    int estimatedDuration,
-    LocalDateTime estimatedCompletedAt
+    Estimation estimation
 ) {
 
 }

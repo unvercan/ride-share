@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
+import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 @Getter
@@ -27,5 +28,16 @@ public class Ride extends BaseEntity<UUID> {
   private LocalDateTime pickupEndAt;
   private LocalDateTime completedAt;
   private LocalDateTime canceledAt;
+
+  public static Ride of(RequestRideDto request) {
+    Ride ride = new Ride();
+
+    ride.setPassengerId(request.passengerId());
+    ride.setPickup(request.pickup());
+    ride.setDropOff(request.dropOff());
+    ride.setStatus(RideStatus.REQUESTED);
+
+    return ride;
+  }
 
 }

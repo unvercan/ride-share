@@ -13,6 +13,7 @@ import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
+import tr.unvercanunlu.ride_share.dto.request.UpdateLocationDto;
 import tr.unvercanunlu.ride_share.dto.response.PassengerPickupDto;
 import tr.unvercanunlu.ride_share.dto.response.RideAcceptedDto;
 import tr.unvercanunlu.ride_share.dto.response.RideCanceledDto;
@@ -31,14 +32,18 @@ import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
 import tr.unvercanunlu.ride_share.service.CalculationService;
 import tr.unvercanunlu.ride_share.service.DriverService;
+import tr.unvercanunlu.ride_share.service.EstimationService;
 import tr.unvercanunlu.ride_share.service.GeoService;
 import tr.unvercanunlu.ride_share.service.PassengerService;
 import tr.unvercanunlu.ride_share.service.RideService;
+import tr.unvercanunlu.ride_share.service.ValidationService;
 import tr.unvercanunlu.ride_share.service.impl.CalculationServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.DriverServiceImpl;
+import tr.unvercanunlu.ride_share.service.impl.EstimationServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.GeoServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.PassengerServiceImpl;
 import tr.unvercanunlu.ride_share.service.impl.RideServiceImpl;
+import tr.unvercanunlu.ride_share.service.impl.ValidationServiceImpl;
 
 public class DemoApp {
 
@@ -49,11 +54,14 @@ public class DemoApp {
     RideRepository rideRepository = new RideRepositoryImpl();
 
     // Services
+    ValidationService validationService = new ValidationServiceImpl(rideRepository, driverRepository);
     GeoService geoService = new GeoServiceImpl();
-    DriverService driverService = new DriverServiceImpl(driverRepository, rideRepository);
+    EstimationService estimationService = new EstimationServiceImpl(geoService);
+    DriverService driverService = new DriverServiceImpl(driverRepository, validationService);
     PassengerService passengerService = new PassengerServiceImpl(passengerRepository);
     CalculationService calculationService = new CalculationServiceImpl();
-    RideService rideService = new RideServiceImpl(rideRepository, driverRepository, driverService, passengerService, geoService, calculationService);
+    RideService rideService = new RideServiceImpl(
+        rideRepository, driverRepository, passengerRepository, geoService, calculationService, estimationService, validationService);
 
     // === DRIVER SERVICE ===
     System.out.println("=== DRIVER SERVICE DEMO ===");
@@ -65,7 +73,8 @@ public class DemoApp {
 
     // Update Location (valid)
     Location current = new Location(10.0, 20.0);
-    driverService.updateLocation(driver.getId(), current);
+    UpdateLocationDto updateLocationRequest = new UpdateLocationDto(driver.getId(), current);
+    driverService.updateLocation(updateLocationRequest);
 
     // Make driver available
     driverService.makeAvailable(driver.getId());
@@ -73,7 +82,8 @@ public class DemoApp {
 
     // Try to update location for non-existent driver
     try {
-      driverService.updateLocation(UUID.randomUUID(), current);
+      UpdateLocationDto updateLocationRequestForDriverNotFound = new UpdateLocationDto(UUID.randomUUID(), current);
+      driverService.updateLocation(updateLocationRequestForDriverNotFound);
     } catch (DriverNotFoundException ex) {
       System.out.println("Caught expected: " + ex.getMessage());
     }

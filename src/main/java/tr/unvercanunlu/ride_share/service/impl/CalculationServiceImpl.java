@@ -9,6 +9,10 @@ public class CalculationServiceImpl implements CalculationService {
 
   @Override
   public BigDecimal calculatePrice(double distance) {
+    if (distance < 0) {
+      throw new IllegalArgumentException("Distance cannot be negative: %f".formatted(distance));
+    }
+
     return BigDecimal.valueOf(
         AppConfig.BASE_FARE + (distance * AppConfig.KM_RATE)
     ).setScale(2, RoundingMode.HALF_UP);

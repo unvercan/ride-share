@@ -17,18 +17,17 @@ public class PassengerServiceImpl implements PassengerService {
 
   @Override
   public Passenger register(RegisterPassengerDto request) {
-    Passenger passenger = new Passenger();
-    passenger.setName(request.name());
-    passenger.setEmail(request.email());
-    passenger.setPhone(request.phone());
-
+    Passenger passenger = Passenger.of(request);
     return passengerRepository.save(passenger);
   }
 
   @Override
   public Passenger getDetail(UUID passengerId) throws PassengerNotFoundException {
-    return passengerRepository.get(passengerId)
-        .orElseThrow(() -> new PassengerNotFoundException(passengerId));
+    if (passengerId == null) {
+      throw new IllegalArgumentException("Passenger ID missing!");
+    }
+
+    return passengerRepository.get(passengerId).orElseThrow(() -> new PassengerNotFoundException(passengerId));
   }
 
 }

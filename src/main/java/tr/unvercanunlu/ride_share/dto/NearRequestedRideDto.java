@@ -3,6 +3,7 @@ package tr.unvercanunlu.ride_share.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import tr.unvercanunlu.ride_share.dto.response.Estimation;
 import tr.unvercanunlu.ride_share.entity.Location;
 
 public record NearRequestedRideDto(
@@ -16,11 +17,7 @@ public record NearRequestedRideDto(
     LocalDateTime requestEndAt,
     Location current,
     double distanceToPickup,
-
-    // estimations
-    LocalDateTime estimatedPickupAt,
-    LocalDateTime estimatedPickupEndAt,
-    LocalDateTime estimatedCompletedAt
+    Estimation estimation
 ) {
 
 }

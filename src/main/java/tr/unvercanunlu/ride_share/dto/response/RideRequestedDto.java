@@ -14,9 +14,7 @@ public record RideRequestedDto(
     BigDecimal fare,
     LocalDateTime requestedAt,
     LocalDateTime requestEndAt,
-
-    // estimations
-    int estimatedDuration
+    Estimation estimation
 ) {
 
 }
