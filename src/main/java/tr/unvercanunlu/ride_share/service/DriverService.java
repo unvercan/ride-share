@@ -5,6 +5,7 @@ import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.dto.request.UpdateLocationDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
+import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 
 public interface DriverService {
 
@@ -16,6 +17,6 @@ public interface DriverService {
 
   Driver makeAvailable(UUID driverId);
 
-  Driver getDetail(UUID driverId) throws DriverNotFoundException;
+  Driver getDetail(UUID driverId) throws IdentifierMissingException, DriverNotFoundException;
 
 }

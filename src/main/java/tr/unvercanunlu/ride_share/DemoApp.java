@@ -24,7 +24,7 @@ import tr.unvercanunlu.ride_share.entity.Location;
 import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.exception.DriverHasActiveRideException;
-import tr.unvercanunlu.ride_share.exception.DriverMissingException;
+import tr.unvercanunlu.ride_share.exception.DriverMissingForRideException;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
 import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
 import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
@@ -188,7 +188,7 @@ public class DemoApp {
 
     try {
       rideService.complete(requested.id());
-    } catch (DriverMissingException ex) {
+    } catch (DriverMissingForRideException ex) {
       System.out.println("Caught expected: " + ex.getMessage());
     }
 

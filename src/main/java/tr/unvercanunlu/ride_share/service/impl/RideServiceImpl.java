@@ -20,9 +20,11 @@ import tr.unvercanunlu.ride_share.dto.response.RideCompletedDto;
 import tr.unvercanunlu.ride_share.dto.response.RideRequestedDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.entity.Location;
+import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.exception.DriverMissingException;
+import tr.unvercanunlu.ride_share.exception.DriverMissingForRideException;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
+import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
 import tr.unvercanunlu.ride_share.service.CalculationService;
@@ -62,9 +64,9 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideRequestedDto request(RequestRideDto request) throws PassengerNotFoundException {
+  public RideRequestedDto request(RequestRideDto request) throws IdentifierMissingException, PassengerNotFoundException {
     if (request.passengerId() == null) {
-      throw new IllegalArgumentException("Passenger ID missing!");
+      throw new IdentifierMissingException(Passenger.class);
     }
 
     passengerRepository.get(request.passengerId()).orElseThrow(() -> new PassengerNotFoundException(request.passengerId()));
@@ -100,22 +102,19 @@ public class RideServiceImpl implements RideService {
         continue;
       }
 
-      NearRequestedRideDto nearRequestedRide;
+      Estimation estimation = null;
       if (AppConfig.ESTIMATION) {
-        Estimation estimation = estimationService.estimate(ride.getPickup(), ride.getDropOff(), current, gapStart);
+        estimation = estimationService.estimate(ride.getPickup(), ride.getDropOff(), current, gapStart);
 
         if (ride.getRequestEndAt().isAfter(estimation.pickupAt())) {
-          nearRequestedRide = new NearRequestedRideDto(
-              ride.getId(), ride.getPassengerId(), ride.getPickup(), ride.getDropOff(), ride.getDistance(),
-              ride.getFare(), ride.getRequestedAt(), ride.getRequestEndAt(), current, distanceToPickup, estimation
-          );
+          continue;
         }
-      } else {
-        nearRequestedRide = new NearRequestedRideDto(
-            ride.getId(), ride.getPassengerId(), ride.getPickup(), ride.getDropOff(), ride.getDistance(),
-            ride.getFare(), ride.getRequestedAt(), ride.getRequestEndAt(), current, distanceToPickup, null
-        );
       }
+
+      NearRequestedRideDto nearRequestedRide = new NearRequestedRideDto(
+          ride.getId(), ride.getPassengerId(), ride.getPickup(), ride.getDropOff(), ride.getDistance(),
+          ride.getFare(), ride.getRequestedAt(), ride.getRequestEndAt(), current, distanceToPickup, estimation
+      );
 
       nearRequestedRides.add(nearRequestedRide);
     }
@@ -128,7 +127,7 @@ public class RideServiceImpl implements RideService {
     Ride ride = getDetail(request.rideId());
 
     if (ride.getDriverId() == null) {
-      throw new DriverMissingException(ride.getId());
+      throw new DriverMissingForRideException(ride.getId());
     }
 
     validationService.checkDriverUnavailable(request.driverId());
@@ -151,11 +150,11 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public PassengerPickupDto pickupPassenger(UUID rideId) throws DriverMissingException {
+  public PassengerPickupDto pickupPassenger(UUID rideId) throws DriverMissingForRideException {
     Ride ride = getDetail(rideId);
 
     if (ride.getDriverId() == null) {
-      throw new DriverMissingException(rideId);
+      throw new DriverMissingForRideException(rideId);
     }
 
     setDriverBusy(ride.getDriverId());
@@ -176,11 +175,11 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideCompletedDto complete(UUID rideId) throws DriverMissingException {
+  public RideCompletedDto complete(UUID rideId) throws DriverMissingForRideException {
     Ride ride = getDetail(rideId);
 
     if (ride.getDriverId() == null) {
-      throw new DriverMissingException(rideId);
+      throw new DriverMissingForRideException(rideId);
     }
 
     setDriverAvailable(ride.getDriverId());
@@ -213,27 +212,27 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public Ride getDetail(UUID rideId) throws RideNotFoundException {
+  public Ride getDetail(UUID rideId) throws IdentifierMissingException, RideNotFoundException {
     if (rideId == null) {
-      throw new IllegalArgumentException("Ride ID missing!");
+      throw new IdentifierMissingException(Ride.class);
     }
 
     return rideRepository.get(rideId).orElseThrow(() -> new RideNotFoundException(rideId));
   }
 
   @Override
-  public List<Ride> getHistoryOfPassenger(UUID passengerId) {
+  public List<Ride> getHistoryOfPassenger(UUID passengerId) throws IdentifierMissingException {
     if (passengerId == null) {
-      throw new IllegalArgumentException("Passenger ID missing!");
+      throw new IdentifierMissingException(Passenger.class);
     }
 
     return rideRepository.getByPassenger(passengerId);
   }
 
   @Override
-  public List<Ride> getHistoryOfDriver(UUID driverId) {
+  public List<Ride> getHistoryOfDriver(UUID driverId) throws IdentifierMissingException {
     if (driverId == null) {
-      throw new IllegalArgumentException("Driver ID missing!");
+      throw new IdentifierMissingException(Driver.class);
     }
 
     return rideRepository.getByDriver(driverId);

@@ -12,28 +12,29 @@ import tr.unvercanunlu.ride_share.dto.response.RideCompletedDto;
 import tr.unvercanunlu.ride_share.dto.response.RideRequestedDto;
 import tr.unvercanunlu.ride_share.entity.Location;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.exception.DriverMissingException;
+import tr.unvercanunlu.ride_share.exception.DriverMissingForRideException;
+import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
 
 public interface RideService {
 
-  RideRequestedDto request(RequestRideDto request) throws PassengerNotFoundException;
+  RideRequestedDto request(RequestRideDto request) throws IdentifierMissingException, PassengerNotFoundException;
 
   List<NearRequestedRideDto> findNearestRequestedRides(Location current);
 
-  RideAcceptedDto accept(AcceptRideDto request) throws DriverMissingException;
+  RideAcceptedDto accept(AcceptRideDto request) throws DriverMissingForRideException;
 
-  PassengerPickupDto pickupPassenger(UUID rideId) throws DriverMissingException;
+  PassengerPickupDto pickupPassenger(UUID rideId) throws DriverMissingForRideException;
 
-  RideCompletedDto complete(UUID rideId) throws DriverMissingException;
+  RideCompletedDto complete(UUID rideId) throws DriverMissingForRideException;
 
   RideCanceledDto cancel(UUID rideId);
 
-  Ride getDetail(UUID rideId) throws RideNotFoundException;
+  Ride getDetail(UUID rideId) throws IdentifierMissingException, RideNotFoundException;
 
-  List<Ride> getHistoryOfPassenger(UUID passengerId);
+  List<Ride> getHistoryOfPassenger(UUID passengerId) throws IdentifierMissingException;
 
-  List<Ride> getHistoryOfDriver(UUID driverId);
+  List<Ride> getHistoryOfDriver(UUID driverId) throws IdentifierMissingException;
 
 }
