@@ -13,4 +13,5 @@ public class CalculationServiceImpl implements CalculationService {
         AppConfig.BASE_FARE + (distance * AppConfig.KM_RATE)
     ).setScale(2, RoundingMode.HALF_UP);
   }
+
 }

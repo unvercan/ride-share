@@ -18,7 +18,6 @@ public class PassengerServiceImpl implements PassengerService {
   @Override
   public Passenger register(RegisterPassengerDto request) {
     Passenger passenger = new Passenger();
-    passenger.setId(UUID.randomUUID());
     passenger.setName(request.name());
     passenger.setEmail(request.email());
     passenger.setPhone(request.phone());

@@ -27,7 +27,6 @@ public class DriverServiceImpl implements DriverService {
   @Override
   public Driver register(RegisterDriverDto request) {
     Driver driver = new Driver();
-    driver.setId(UUID.randomUUID());
     driver.setName(request.name());
     driver.setEmail(request.email());
     driver.setPhone(request.phone());
@@ -39,8 +38,7 @@ public class DriverServiceImpl implements DriverService {
 
   @Override
   public Driver updateLocation(UUID driverId, Location current) throws DriverNotFoundException {
-    Driver driver = driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+    Driver driver = getDetail(driverId);
 
     driver.setCurrent(current);
 
@@ -49,8 +47,7 @@ public class DriverServiceImpl implements DriverService {
 
   @Override
   public Driver makeOffline(UUID driverId) throws DriverNotFoundException, DriverHasActiveRideException {
-    Driver driver = driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+    Driver driver = getDetail(driverId);
 
     if (rideRepository.checkActiveRideForDriver(driverId)) {
       throw new DriverHasActiveRideException(driverId);
@@ -63,8 +60,11 @@ public class DriverServiceImpl implements DriverService {
 
   @Override
   public Driver makeAvailable(UUID driverId) throws DriverNotFoundException {
-    Driver driver = driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+    Driver driver = getDetail(driverId);
+
+    if (rideRepository.checkActiveRideForDriver(driverId)) {
+      throw new DriverHasActiveRideException(driverId);
+    }
 
     driver.setStatus(DriverStatus.AVAILABLE);
 

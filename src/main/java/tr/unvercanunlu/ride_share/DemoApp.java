@@ -53,7 +53,7 @@ public class DemoApp {
     DriverService driverService = new DriverServiceImpl(driverRepository, rideRepository);
     PassengerService passengerService = new PassengerServiceImpl(passengerRepository);
     CalculationService calculationService = new CalculationServiceImpl();
-    RideService rideService = new RideServiceImpl(rideRepository, driverRepository, passengerRepository, geoService, calculationService);
+    RideService rideService = new RideServiceImpl(rideRepository, driverRepository, driverService, passengerService, geoService, calculationService);
 
     // === DRIVER SERVICE ===
     System.out.println("=== DRIVER SERVICE DEMO ===");

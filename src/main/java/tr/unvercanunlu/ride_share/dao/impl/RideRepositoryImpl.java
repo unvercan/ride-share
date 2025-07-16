@@ -16,7 +16,7 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
     return entities.values()
         .stream()
         .filter(ride -> RideStatus.REQUESTED.equals(ride.getStatus()))
-        .filter(ride -> gapStart.isAfter(ride.getRequestedAt()) && gapEnd.isBefore(ride.getRequestEndAt()))
+        .filter(ride -> !ride.getRequestedAt().isBefore(gapStart) && !ride.getRequestedAt().isAfter(gapEnd))
         .toList();
   }
 

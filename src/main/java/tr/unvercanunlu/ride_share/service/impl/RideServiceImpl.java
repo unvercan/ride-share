@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.config.AppConfig;
 import tr.unvercanunlu.ride_share.dao.DriverRepository;
-import tr.unvercanunlu.ride_share.dao.PassengerRepository;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.dto.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
@@ -24,13 +23,13 @@ import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.exception.DriverHasActiveRideException;
 import tr.unvercanunlu.ride_share.exception.DriverMissingException;
-import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
 import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
 import tr.unvercanunlu.ride_share.exception.PassengerHasActiveRideException;
-import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
 import tr.unvercanunlu.ride_share.service.CalculationService;
+import tr.unvercanunlu.ride_share.service.DriverService;
 import tr.unvercanunlu.ride_share.service.GeoService;
+import tr.unvercanunlu.ride_share.service.PassengerService;
 import tr.unvercanunlu.ride_share.service.RideService;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 import tr.unvercanunlu.ride_share.status.RideStatus;
@@ -39,28 +38,30 @@ public class RideServiceImpl implements RideService {
 
   private final RideRepository rideRepository;
   private final DriverRepository driverRepository;
-  private final PassengerRepository passengerRepository;
+  private final DriverService driverService;
+  private final PassengerService passengerService;
   private final GeoService geoService;
   private final CalculationService calculationService;
 
   public RideServiceImpl(
       RideRepository rideRepository,
       DriverRepository driverRepository,
-      PassengerRepository passengerRepository,
+      DriverService driverService,
+      PassengerService passengerService,
       GeoService geoService,
       CalculationService calculationService
   ) {
     this.rideRepository = rideRepository;
     this.driverRepository = driverRepository;
-    this.passengerRepository = passengerRepository;
+    this.driverService = driverService;
+    this.passengerService = passengerService;
     this.geoService = geoService;
     this.calculationService = calculationService;
   }
 
   @Override
-  public RideRequestedDto request(RequestRideDto request) throws PassengerNotFoundException, PassengerHasActiveRideException {
-    Passenger passenger = passengerRepository.get(request.passengerId())
-        .orElseThrow(() -> new PassengerNotFoundException(request.passengerId()));
+  public RideRequestedDto request(RequestRideDto request) throws PassengerHasActiveRideException {
+    Passenger passenger = passengerService.getDetail(request.passengerId());
 
     if (rideRepository.checkActiveRideForPassenger(passenger.getId())) {
       throw new PassengerHasActiveRideException(passenger.getId());
@@ -74,7 +75,6 @@ public class RideServiceImpl implements RideService {
     BigDecimal fare = calculationService.calculatePrice(distance);
 
     Ride ride = new Ride();
-    ride.setId(UUID.randomUUID());
     ride.setPassengerId(passenger.getId());
     ride.setPickup(request.pickup());
     ride.setDropOff(request.dropOff());
@@ -163,10 +163,8 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideAcceptedDto accept(AcceptRideDto request)
-      throws RideNotFoundException, DriverNotFoundException, DriverUnavailableException, DriverHasActiveRideException {
-    Ride ride = rideRepository.get(request.rideId())
-        .orElseThrow(() -> new RideNotFoundException(request.rideId()));
+  public RideAcceptedDto accept(AcceptRideDto request) {
+    Ride ride = getDetail(request.rideId());
 
     checkDriverSuitable(request.driverId());
 
@@ -212,9 +210,8 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public PassengerPickupDto pickupPassenger(UUID rideId) throws RideNotFoundException {
-    Ride ride = rideRepository.get(rideId)
-        .orElseThrow(() -> new RideNotFoundException(rideId));
+  public PassengerPickupDto pickupPassenger(UUID rideId) throws DriverMissingException {
+    Ride ride = getDetail(rideId);
 
     if (ride.getDriverId() == null) {
       throw new DriverMissingException(rideId);
@@ -253,9 +250,8 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideCompletedDto complete(UUID rideId) throws RideNotFoundException {
-    Ride ride = rideRepository.get(rideId)
-        .orElseThrow(() -> new RideNotFoundException(rideId));
+  public RideCompletedDto complete(UUID rideId) throws DriverMissingException {
+    Ride ride = getDetail(rideId);
 
     if (ride.getDriverId() == null) {
       throw new DriverMissingException(rideId);
@@ -286,9 +282,8 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideCanceledDto cancel(UUID rideId) throws RideNotFoundException {
-    Ride ride = rideRepository.get(rideId)
-        .orElseThrow(() -> new RideNotFoundException(rideId));
+  public RideCanceledDto cancel(UUID rideId) {
+    Ride ride = getDetail(rideId);
 
     ride.setCanceledAt(LocalDateTime.now());
     ride.setStatus(RideStatus.CANCELED);
@@ -319,42 +314,37 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public List<Ride> getHistoryOfPassenger(UUID passengerId) throws PassengerNotFoundException {
-    passengerRepository.get(passengerId)
-        .orElseThrow(() -> new PassengerNotFoundException(passengerId));
+  public List<Ride> getHistoryOfPassenger(UUID passengerId) {
+    passengerService.getDetail(passengerId);
 
     return rideRepository.getByPassenger(passengerId);
   }
 
   @Override
-  public List<Ride> getHistoryOfDriver(UUID driverId) throws DriverNotFoundException {
-    driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+  public List<Ride> getHistoryOfDriver(UUID driverId) {
+    driverService.getDetail(driverId);
 
     return rideRepository.getByDriver(driverId);
   }
 
-  private void setDriverAvailable(UUID driverId) throws DriverNotFoundException {
-    Driver driver = driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+  private void setDriverAvailable(UUID driverId) {
+    Driver driver = driverService.getDetail(driverId);
 
     driver.setStatus(DriverStatus.AVAILABLE);
 
     driverRepository.save(driver);
   }
 
-  private void setDriverBusy(UUID driverId) throws DriverNotFoundException {
-    Driver driver = driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+  private void setDriverBusy(UUID driverId) {
+    Driver driver = driverService.getDetail(driverId);
 
     driver.setStatus(DriverStatus.BUSY);
 
     driverRepository.save(driver);
   }
 
-  private void checkDriverSuitable(UUID driverId) throws DriverNotFoundException, DriverUnavailableException, DriverHasActiveRideException {
-    Driver driver = driverRepository.get(driverId)
-        .orElseThrow(() -> new DriverNotFoundException(driverId));
+  private void checkDriverSuitable(UUID driverId) throws DriverUnavailableException, DriverHasActiveRideException {
+    Driver driver = driverService.getDetail(driverId);
 
     if (!driver.getStatus().equals(DriverStatus.AVAILABLE)) {
       throw new DriverUnavailableException(driver.getId());
