@@ -58,7 +58,7 @@ public class DemoApp {
     GeoService geoService = new GeoServiceImpl();
     EstimationService estimationService = new EstimationServiceImpl(geoService);
     DriverService driverService = new DriverServiceImpl(driverRepository, validationService);
-    PassengerService passengerService = new PassengerServiceImpl(passengerRepository);
+    PassengerService passengerService = new PassengerServiceImpl(passengerRepository, validationService);
     CalculationService calculationService = new CalculationServiceImpl();
     RideService rideService = new RideServiceImpl(
         rideRepository, driverRepository, passengerRepository, geoService, calculationService, estimationService, validationService);

@@ -24,7 +24,6 @@ import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.exception.DriverMissingForRideException;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
-import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
 import tr.unvercanunlu.ride_share.service.CalculationService;
@@ -64,10 +63,8 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideRequestedDto request(RequestRideDto request) throws IdentifierMissingException, PassengerNotFoundException {
-    if (request.passengerId() == null) {
-      throw new IdentifierMissingException(Passenger.class);
-    }
+  public RideRequestedDto request(RequestRideDto request) throws PassengerNotFoundException {
+    validationService.checkIdentifier(request.passengerId(), Passenger.class);
 
     passengerRepository.get(request.passengerId()).orElseThrow(() -> new PassengerNotFoundException(request.passengerId()));
     validationService.checkActiveRideForPassenger(request.passengerId());
@@ -212,29 +209,20 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public Ride getDetail(UUID rideId) throws IdentifierMissingException, RideNotFoundException {
-    if (rideId == null) {
-      throw new IdentifierMissingException(Ride.class);
-    }
-
+  public Ride getDetail(UUID rideId) throws RideNotFoundException {
+    validationService.checkIdentifier(rideId, Ride.class);
     return rideRepository.get(rideId).orElseThrow(() -> new RideNotFoundException(rideId));
   }
 
   @Override
-  public List<Ride> getHistoryOfPassenger(UUID passengerId) throws IdentifierMissingException {
-    if (passengerId == null) {
-      throw new IdentifierMissingException(Passenger.class);
-    }
-
+  public List<Ride> getHistoryOfPassenger(UUID passengerId) {
+    validationService.checkIdentifier(passengerId, Passenger.class);
     return rideRepository.getByPassenger(passengerId);
   }
 
   @Override
-  public List<Ride> getHistoryOfDriver(UUID driverId) throws IdentifierMissingException {
-    if (driverId == null) {
-      throw new IdentifierMissingException(Driver.class);
-    }
-
+  public List<Ride> getHistoryOfDriver(UUID driverId) {
+    validationService.checkIdentifier(driverId, Driver.class);
     return rideRepository.getByDriver(driverId);
   }
 

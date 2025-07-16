@@ -6,7 +6,6 @@ import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.dto.request.UpdateLocationDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
-import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 import tr.unvercanunlu.ride_share.service.DriverService;
 import tr.unvercanunlu.ride_share.service.ValidationService;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
@@ -51,11 +50,8 @@ public class DriverServiceImpl implements DriverService {
   }
 
   @Override
-  public Driver getDetail(UUID driverId) throws IdentifierMissingException, DriverNotFoundException {
-    if (driverId == null) {
-      throw new IdentifierMissingException(Driver.class);
-    }
-
+  public Driver getDetail(UUID driverId) throws DriverNotFoundException {
+    validationService.checkIdentifier(driverId, Driver.class);
     return driverRepository.get(driverId).orElseThrow(() -> new DriverNotFoundException(driverId));
   }
 
