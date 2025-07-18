@@ -3,7 +3,6 @@ package tr.unvercanunlu.ride_share.status;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public enum DriverStatus {
 
@@ -11,6 +10,7 @@ public enum DriverStatus {
   BUSY('B'),
   OFFLINE('O');
 
+  @Getter
   private final char code;
 
 }

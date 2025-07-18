@@ -2,9 +2,9 @@ package tr.unvercanunlu.ride_share.service;
 
 import java.util.List;
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dto.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
+import tr.unvercanunlu.ride_share.dto.response.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.response.PassengerPickupDto;
 import tr.unvercanunlu.ride_share.dto.response.RideAcceptedDto;
 import tr.unvercanunlu.ride_share.dto.response.RideCanceledDto;

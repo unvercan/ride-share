@@ -3,7 +3,6 @@ package tr.unvercanunlu.ride_share.status;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public enum RideStatus {
 
@@ -13,6 +12,7 @@ public enum RideStatus {
   COMPLETED('C'),
   CANCELED('X');
 
+  @Getter
   private final char code;
 
 }

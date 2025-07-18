@@ -1,9 +1,8 @@
-package tr.unvercanunlu.ride_share.dto;
+package tr.unvercanunlu.ride_share.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.dto.response.Estimation;
 import tr.unvercanunlu.ride_share.entity.Location;
 
 public record NearRequestedRideDto(

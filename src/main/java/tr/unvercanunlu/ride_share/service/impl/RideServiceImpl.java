@@ -9,10 +9,10 @@ import tr.unvercanunlu.ride_share.config.AppConfig;
 import tr.unvercanunlu.ride_share.dao.DriverRepository;
 import tr.unvercanunlu.ride_share.dao.PassengerRepository;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
-import tr.unvercanunlu.ride_share.dto.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
 import tr.unvercanunlu.ride_share.dto.response.Estimation;
+import tr.unvercanunlu.ride_share.dto.response.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.response.PassengerPickupDto;
 import tr.unvercanunlu.ride_share.dto.response.RideAcceptedDto;
 import tr.unvercanunlu.ride_share.dto.response.RideCanceledDto;
@@ -68,16 +68,19 @@ public class RideServiceImpl implements RideService {
 
     passengerRepository.get(request.passengerId()).orElseThrow(() -> new PassengerNotFoundException(request.passengerId()));
     validationService.checkActiveRideForPassenger(request.passengerId());
+
     Ride ride = Ride.of(request);
+
     ride.setRequestedAt(LocalDateTime.now());
     ride.setRequestEndAt(ride.getRequestedAt().plusMinutes(AppConfig.MAX_DURATION));
     ride.setDistance(geoService.calculateDistance(request.pickup(), request.dropOff()));
     ride.setFare(calculationService.calculatePrice(ride.getDistance()));
+
     ride = rideRepository.save(ride);
 
     Estimation estimation = null;
     if (AppConfig.ESTIMATION) {
-      estimation = estimationService.estimate(request.pickup(), request.dropOff());
+      estimation = estimationService.estimate(ride.getPickup(), ride.getDropOff());
     }
 
     return new RideRequestedDto(
@@ -90,9 +93,10 @@ public class RideServiceImpl implements RideService {
   public List<NearRequestedRideDto> findNearestRequestedRides(Location current) {
     LocalDateTime gapStart = LocalDateTime.now();
     LocalDateTime gapEnd = gapStart.plusMinutes(AppConfig.MAX_DURATION);
+
     List<Ride> requestedRides = rideRepository.getRequestedRidesBetweenGap(gapStart, gapEnd);
 
-    List<NearRequestedRideDto> nearRequestedRides = new ArrayList<>();
+    List<NearRequestedRideDto> nearRequestedRideDtos = new ArrayList<>();
     for (Ride ride : requestedRides) {
       double distanceToPickup = geoService.calculateDistance(ride.getPickup(), current);
       if (distanceToPickup > AppConfig.NEAR_DISTANCE) {
@@ -108,15 +112,15 @@ public class RideServiceImpl implements RideService {
         }
       }
 
-      NearRequestedRideDto nearRequestedRide = new NearRequestedRideDto(
+      NearRequestedRideDto nearRequestedRideDto = new NearRequestedRideDto(
           ride.getId(), ride.getPassengerId(), ride.getPickup(), ride.getDropOff(), ride.getDistance(),
           ride.getFare(), ride.getRequestedAt(), ride.getRequestEndAt(), current, distanceToPickup, estimation
       );
 
-      nearRequestedRides.add(nearRequestedRide);
+      nearRequestedRideDtos.add(nearRequestedRideDto);
     }
 
-    return nearRequestedRides;
+    return nearRequestedRideDtos;
   }
 
   @Override
@@ -129,10 +133,13 @@ public class RideServiceImpl implements RideService {
 
     validationService.checkDriverUnavailable(request.driverId());
     validationService.checkActiveRideForDriver(request.driverId());
+
     setDriverBusy(ride.getDriverId());
+
     ride.setDriverId(request.driverId());
     ride.setAcceptedAt(LocalDateTime.now());
     ride.setStatus(RideStatus.ACCEPTED);
+
     ride = rideRepository.save(ride);
 
     Estimation estimation = null;
@@ -155,9 +162,11 @@ public class RideServiceImpl implements RideService {
     }
 
     setDriverBusy(ride.getDriverId());
+
     ride.setPickupAt(LocalDateTime.now());
     ride.setPickupEndAt(ride.getPickupAt().plusMinutes(AppConfig.MAX_DURATION));
     ride.setStatus(RideStatus.STARTED);
+
     ride = rideRepository.save(ride);
 
     Estimation estimation = null;
@@ -180,9 +189,11 @@ public class RideServiceImpl implements RideService {
     }
 
     setDriverAvailable(ride.getDriverId());
+
     ride.setCompletedAt(LocalDateTime.now());
     ride.setDuration(Duration.between(ride.getPickupAt(), ride.getCompletedAt()).toMinutes());
     ride.setStatus(RideStatus.COMPLETED);
+
     ride = rideRepository.save(ride);
 
     return new RideCompletedDto(
@@ -196,6 +207,7 @@ public class RideServiceImpl implements RideService {
     Ride ride = getDetail(rideId);
     ride.setCanceledAt(LocalDateTime.now());
     ride.setStatus(RideStatus.CANCELED);
+
     ride = rideRepository.save(ride);
 
     if (ride.getDriverId() != null) {
