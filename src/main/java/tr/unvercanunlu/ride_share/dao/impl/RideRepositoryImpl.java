@@ -37,14 +37,14 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
   }
 
   @Override
-  public boolean checkActiveRideForPassenger(UUID passengerId) {
+  public boolean checkActiveRideExistsForPassenger(UUID passengerId) {
     return getByPassenger(passengerId)
         .stream()
         .anyMatch(ride -> AppConfig.ACTIVE_RIDE_STATUSES.contains(ride.getStatus()));
   }
 
   @Override
-  public boolean checkActiveRideForDriver(UUID driverId) {
+  public boolean checkActiveRideExistsForDriver(UUID driverId) {
     return getByDriver(driverId)
         .stream()
         .anyMatch(ride -> AppConfig.ACTIVE_RIDE_STATUSES.contains(ride.getStatus()));

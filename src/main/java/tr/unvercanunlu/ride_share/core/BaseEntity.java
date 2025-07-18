@@ -3,7 +3,7 @@ package tr.unvercanunlu.ride_share.core;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class BaseEntity<K> {
+public abstract class BaseEntity<K> implements Entity {
 
   @Setter
   @Getter

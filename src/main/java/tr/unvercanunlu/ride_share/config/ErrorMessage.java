@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorMessage {
 
-  public static final String DRIVER_NOT_FOUND = "Driver not found: ID=%s";
-  public static final String PASSENGER_NOT_FOUND = "Passenger not found: ID=%s";
-  public static final String RIDE_NOT_FOUND = "Ride not found: ID=%s";
-  public static final String PASSENGER_HAS_ACTIVE_RIDE = "An active ride for the passenger: ID=%s";
-  public static final String DRIVER_HAS_ACTIVE_RIDE = "An active ride for the driver: ID=%s";
-  public static final String DRIVER_UNAVAILABLE = "Driver unavailable: ID=%s";
-  public static final String DRIVER_MISSING_FOR_RIDE = "Driver missing for the ride: ID=%s";
-  public static final String IDENTIFIER_MISSING = "ID missing for %s";
+  public static final String NOT_FOUND = "%s %s not found!";
+  public static final String HAS_ACTIVE_RIDE = "An active ride for %s %s!";
+  public static final String DRIVER_UNAVAILABLE = "Driver %s unavailable!";
+  public static final String DRIVER_MISSING = "Driver missing for ride %s!";
+  public static final String IDENTIFIER_MISSING = "ID missing for %s!";
+  public static final String RIDE_ALREADY_COMPLETED = "Ride %s already completed!";
+  public static final String RIDE_ALREADY_ACCEPTED = "Ride %s already accepted by other driver!";
+  public static final String RIDE_STATUS_NOT_EXPECTED = "Ride %s status not expected, expected=%s actual=%s!";
 
 }

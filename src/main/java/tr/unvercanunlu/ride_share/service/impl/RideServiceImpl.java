@@ -4,13 +4,15 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.config.AppConfig;
 import tr.unvercanunlu.ride_share.dao.DriverRepository;
-import tr.unvercanunlu.ride_share.dao.PassengerRepository;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.dto.request.AcceptRideDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
+import tr.unvercanunlu.ride_share.dto.response.DriverApprovedDto;
 import tr.unvercanunlu.ride_share.dto.response.Estimation;
 import tr.unvercanunlu.ride_share.dto.response.NearRequestedRideDto;
 import tr.unvercanunlu.ride_share.dto.response.PassengerPickupDto;
@@ -22,23 +24,18 @@ import tr.unvercanunlu.ride_share.entity.Driver;
 import tr.unvercanunlu.ride_share.entity.Location;
 import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.exception.DriverMissingForRideException;
-import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
-import tr.unvercanunlu.ride_share.exception.PassengerNotFoundException;
-import tr.unvercanunlu.ride_share.exception.RideNotFoundException;
+import tr.unvercanunlu.ride_share.exception.NotFoundException;
 import tr.unvercanunlu.ride_share.service.CalculationService;
 import tr.unvercanunlu.ride_share.service.EstimationService;
 import tr.unvercanunlu.ride_share.service.GeoService;
 import tr.unvercanunlu.ride_share.service.RideService;
 import tr.unvercanunlu.ride_share.service.ValidationService;
-import tr.unvercanunlu.ride_share.status.DriverStatus;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 public class RideServiceImpl implements RideService {
 
   private final RideRepository rideRepository;
   private final DriverRepository driverRepository;
-  private final PassengerRepository passengerRepository;
   private final GeoService geoService;
   private final CalculationService calculationService;
   private final EstimationService estimationService;
@@ -47,7 +44,6 @@ public class RideServiceImpl implements RideService {
   public RideServiceImpl(
       RideRepository rideRepository,
       DriverRepository driverRepository,
-      PassengerRepository passengerRepository,
       GeoService geoService,
       CalculationService calculationService,
       EstimationService estimationService,
@@ -55,7 +51,6 @@ public class RideServiceImpl implements RideService {
   ) {
     this.rideRepository = rideRepository;
     this.driverRepository = driverRepository;
-    this.passengerRepository = passengerRepository;
     this.geoService = geoService;
     this.calculationService = calculationService;
     this.estimationService = estimationService;
@@ -63,11 +58,10 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideRequestedDto request(RequestRideDto request) throws PassengerNotFoundException {
+  public RideRequestedDto request(RequestRideDto request) {
     validationService.checkIdentifier(request.passengerId(), Passenger.class);
-
-    passengerRepository.get(request.passengerId()).orElseThrow(() -> new PassengerNotFoundException(request.passengerId()));
-    validationService.checkActiveRideForPassenger(request.passengerId());
+    validationService.checkPassengerExists(request.passengerId());
+    validationService.checkNoActiveRideForPassenger(request.passengerId());
 
     Ride ride = Ride.of(request);
 
@@ -127,14 +121,12 @@ public class RideServiceImpl implements RideService {
   public RideAcceptedDto accept(AcceptRideDto request) {
     Ride ride = getDetail(request.rideId());
 
-    if (ride.getDriverId() == null) {
-      throw new DriverMissingForRideException(ride.getId());
-    }
+    validationService.checkRideStatus(Set.of(RideStatus.REQUESTED), ride);
+    validationService.checkRideAccepted(ride);
+    validationService.checkDriverAvailable(request.driverId());
+    validationService.checkNoActiveRideForDriver(request.driverId());
 
-    validationService.checkDriverUnavailable(request.driverId());
-    validationService.checkActiveRideForDriver(request.driverId());
-
-    setDriverBusy(ride.getDriverId());
+    driverRepository.updateAsBusy(ride.getDriverId());
 
     ride.setDriverId(request.driverId());
     ride.setAcceptedAt(LocalDateTime.now());
@@ -154,14 +146,63 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public PassengerPickupDto pickupPassenger(UUID rideId) throws DriverMissingForRideException {
+  public DriverApprovedDto approveDriver(UUID rideId) {
     Ride ride = getDetail(rideId);
 
-    if (ride.getDriverId() == null) {
-      throw new DriverMissingForRideException(rideId);
+    validationService.checkRideStatus(Set.of(RideStatus.ACCEPTED), ride);
+    validationService.checkDriverPresent(ride);
+    validationService.checkDriverExists(ride.getDriverId());
+
+    driverRepository.updateAsBusy(ride.getDriverId());
+
+    ride.setApprovedAt(LocalDateTime.now());
+    ride.setStatus(RideStatus.APPROVED);
+
+    ride = rideRepository.save(ride);
+
+    return new DriverApprovedDto(
+        ride.getId(), ride.getPassengerId(), ride.getDriverId(), ride.getPickup(), ride.getDropOff(),
+        ride.getDistance(), ride.getFare(), ride.getRequestedAt(), ride.getAcceptedAt(), ride.getApprovedAt()
+    );
+  }
+
+  @Override
+  public RideRequestedDto disapproveDriver(UUID rideId) {
+    Ride ride = getDetail(rideId);
+
+    validationService.checkRideStatus(Set.of(RideStatus.ACCEPTED), ride);
+
+    Optional.ofNullable(ride.getDriverId())
+        .ifPresent(driverRepository::updateAsAvailable);
+
+    ride.setDriverId(null);
+    ride.setAcceptedAt(null);
+    ride.setStatus(RideStatus.REQUESTED);
+    ride.setRequestedAt(LocalDateTime.now());
+    ride.setRequestEndAt(ride.getRequestedAt().plusMinutes(AppConfig.MAX_DURATION));
+
+    ride = rideRepository.save(ride);
+
+    Estimation estimation = null;
+    if (AppConfig.ESTIMATION) {
+      estimation = estimationService.estimate(ride.getPickup(), ride.getDropOff());
     }
 
-    setDriverBusy(ride.getDriverId());
+    return new RideRequestedDto(
+        ride.getId(), ride.getPassengerId(), ride.getPickup(), ride.getDropOff(), ride.getDistance(),
+        ride.getFare(), ride.getRequestedAt(), ride.getRequestedAt(), estimation
+    );
+  }
+
+  @Override
+  public PassengerPickupDto pickupPassenger(UUID rideId) {
+    Ride ride = getDetail(rideId);
+
+    validationService.checkRideStatus(Set.of(RideStatus.APPROVED), ride);
+    validationService.checkDriverPresent(ride);
+    validationService.checkDriverExists(ride.getDriverId());
+
+    driverRepository.updateAsBusy(ride.getDriverId());
 
     ride.setPickupAt(LocalDateTime.now());
     ride.setPickupEndAt(ride.getPickupAt().plusMinutes(AppConfig.MAX_DURATION));
@@ -181,14 +222,14 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public RideCompletedDto complete(UUID rideId) throws DriverMissingForRideException {
+  public RideCompletedDto complete(UUID rideId) {
     Ride ride = getDetail(rideId);
 
-    if (ride.getDriverId() == null) {
-      throw new DriverMissingForRideException(rideId);
-    }
+    validationService.checkRideStatus(Set.of(RideStatus.STARTED), ride);
+    validationService.checkDriverPresent(ride);
+    validationService.checkDriverExists(ride.getDriverId());
 
-    setDriverAvailable(ride.getDriverId());
+    driverRepository.updateAsAvailable(ride.getDriverId());
 
     ride.setCompletedAt(LocalDateTime.now());
     ride.setDuration(Duration.between(ride.getPickupAt(), ride.getCompletedAt()).toMinutes());
@@ -205,14 +246,18 @@ public class RideServiceImpl implements RideService {
   @Override
   public RideCanceledDto cancel(UUID rideId) {
     Ride ride = getDetail(rideId);
+
+    validationService.checkRideCompleted(ride);
+
+    Optional.ofNullable(ride.getDriverId())
+        .ifPresent(driverRepository::updateAsAvailable);
+
     ride.setCanceledAt(LocalDateTime.now());
     ride.setStatus(RideStatus.CANCELED);
 
     ride = rideRepository.save(ride);
 
-    if (ride.getDriverId() != null) {
-      setDriverAvailable(ride.getDriverId());
-    }
+    driverRepository.updateAsAvailable(ride.getDriverId());
 
     return new RideCanceledDto(
         ride.getId(), ride.getPassengerId(), ride.getDriverId(), ride.getPickup(), ride.getDropOff(),
@@ -221,33 +266,25 @@ public class RideServiceImpl implements RideService {
   }
 
   @Override
-  public Ride getDetail(UUID rideId) throws RideNotFoundException {
+  public Ride getDetail(UUID rideId) throws NotFoundException {
     validationService.checkIdentifier(rideId, Ride.class);
-    return rideRepository.get(rideId).orElseThrow(() -> new RideNotFoundException(rideId));
+
+    return rideRepository.get(rideId)
+        .orElseThrow(() -> new NotFoundException(Ride.class, rideId));
   }
 
   @Override
   public List<Ride> getHistoryOfPassenger(UUID passengerId) {
     validationService.checkIdentifier(passengerId, Passenger.class);
+
     return rideRepository.getByPassenger(passengerId);
   }
 
   @Override
   public List<Ride> getHistoryOfDriver(UUID driverId) {
     validationService.checkIdentifier(driverId, Driver.class);
+
     return rideRepository.getByDriver(driverId);
-  }
-
-  private void setDriverAvailable(UUID driverId) throws DriverNotFoundException {
-    Driver driver = driverRepository.get(driverId).orElseThrow(() -> new DriverNotFoundException(driverId));
-    driver.setStatus(DriverStatus.AVAILABLE);
-    driverRepository.save(driver);
-  }
-
-  private void setDriverBusy(UUID driverId) throws DriverNotFoundException {
-    Driver driver = driverRepository.get(driverId).orElseThrow(() -> new DriverNotFoundException(driverId));
-    driver.setStatus(DriverStatus.BUSY);
-    driverRepository.save(driver);
   }
 
 }

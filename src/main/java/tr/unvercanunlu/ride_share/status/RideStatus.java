@@ -8,6 +8,7 @@ public enum RideStatus {
 
   REQUESTED('R'),
   ACCEPTED('A'),
+  APPROVED('P'),
   STARTED('S'),
   COMPLETED('C'),
   CANCELED('X');

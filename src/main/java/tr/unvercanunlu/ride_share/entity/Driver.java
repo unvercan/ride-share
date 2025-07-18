@@ -9,7 +9,7 @@ import tr.unvercanunlu.ride_share.status.DriverStatus;
 
 @Getter
 @Setter
-public class Driver extends BaseEntity<UUID> {
+public class Driver extends BaseEntity<UUID> implements Person {
 
   private String name;
   private String email;

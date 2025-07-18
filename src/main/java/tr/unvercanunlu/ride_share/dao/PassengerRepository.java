@@ -6,4 +6,6 @@ import tr.unvercanunlu.ride_share.entity.Passenger;
 
 public interface PassengerRepository extends Dao<Passenger, UUID> {
 
+  boolean checkExists(UUID passengerId);
+
 }

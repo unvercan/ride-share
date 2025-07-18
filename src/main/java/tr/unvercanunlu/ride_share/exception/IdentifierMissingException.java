@@ -4,15 +4,15 @@ import lombok.Getter;
 import tr.unvercanunlu.ride_share.config.ErrorMessage;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
 
-public class IdentifierMissingException extends RideSharingException {
+public class IdentifierMissingException extends RideSharingBaseException {
 
   @Getter
-  private final String type;
+  private final Class<? extends BaseEntity<?>> entity;
 
-  public IdentifierMissingException(Class<? extends BaseEntity<?>> entityClass) {
-    super(ErrorMessage.IDENTIFIER_MISSING, entityClass.getName());
+  public IdentifierMissingException(Class<? extends BaseEntity<?>> entity) {
+    super(ErrorMessage.IDENTIFIER_MISSING, entity.getSimpleName());
 
-    this.type = entityClass.getName();
+    this.entity = entity;
   }
 
 }

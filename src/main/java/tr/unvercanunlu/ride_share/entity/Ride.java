@@ -24,6 +24,7 @@ public class Ride extends BaseEntity<UUID> {
   private LocalDateTime requestedAt;
   private LocalDateTime requestEndAt;
   private LocalDateTime acceptedAt;
+  private LocalDateTime approvedAt;
   private LocalDateTime pickupAt;
   private LocalDateTime pickupEndAt;
   private LocalDateTime completedAt;

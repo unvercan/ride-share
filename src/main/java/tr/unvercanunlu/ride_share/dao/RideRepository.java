@@ -14,8 +14,8 @@ public interface RideRepository extends Dao<Ride, UUID> {
 
   List<Ride> getByPassenger(UUID passengerId);
 
-  boolean checkActiveRideForPassenger(UUID passengerId);
+  boolean checkActiveRideExistsForPassenger(UUID passengerId);
 
-  boolean checkActiveRideForDriver(UUID driverId);
+  boolean checkActiveRideExistsForDriver(UUID driverId);
 
 }

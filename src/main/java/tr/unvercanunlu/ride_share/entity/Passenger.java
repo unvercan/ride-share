@@ -8,7 +8,7 @@ import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 
 @Getter
 @Setter
-public class Passenger extends BaseEntity<UUID> {
+public class Passenger extends BaseEntity<UUID> implements Person {
 
   private String name;
   private String email;

@@ -5,7 +5,7 @@ import tr.unvercanunlu.ride_share.dao.DriverRepository;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.dto.request.UpdateLocationDto;
 import tr.unvercanunlu.ride_share.entity.Driver;
-import tr.unvercanunlu.ride_share.exception.DriverNotFoundException;
+import tr.unvercanunlu.ride_share.exception.NotFoundException;
 import tr.unvercanunlu.ride_share.service.DriverService;
 import tr.unvercanunlu.ride_share.service.ValidationService;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
@@ -36,7 +36,7 @@ public class DriverServiceImpl implements DriverService {
   @Override
   public Driver makeOffline(UUID driverId) {
     Driver driver = getDetail(driverId);
-    validationService.checkActiveRideForDriver(driverId);
+    validationService.checkNoActiveRideForDriver(driverId);
     driver.setStatus(DriverStatus.OFFLINE);
     return driverRepository.save(driver);
   }
@@ -44,15 +44,16 @@ public class DriverServiceImpl implements DriverService {
   @Override
   public Driver makeAvailable(UUID driverId) {
     Driver driver = getDetail(driverId);
-    validationService.checkActiveRideForDriver(driverId);
+    validationService.checkNoActiveRideForDriver(driverId);
     driver.setStatus(DriverStatus.AVAILABLE);
     return driverRepository.save(driver);
   }
 
   @Override
-  public Driver getDetail(UUID driverId) throws DriverNotFoundException {
+  public Driver getDetail(UUID driverId) throws NotFoundException {
     validationService.checkIdentifier(driverId, Driver.class);
-    return driverRepository.get(driverId).orElseThrow(() -> new DriverNotFoundException(driverId));
+    return driverRepository.get(driverId)
+        .orElseThrow(() -> new NotFoundException(Driver.class, driverId));
   }
 
 }
