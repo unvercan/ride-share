@@ -3,10 +3,12 @@ package tr.unvercanunlu.ride_share.entity;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 
+@ToString
 @Getter
 @Setter
 public class Driver extends BaseEntity<UUID> implements Person {

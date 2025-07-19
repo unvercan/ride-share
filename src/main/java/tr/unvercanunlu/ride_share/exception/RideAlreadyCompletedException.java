@@ -14,4 +14,5 @@ public class RideAlreadyCompletedException extends RideSharingBaseException {
 
     this.rideId = rideId;
   }
+
 }

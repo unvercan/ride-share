@@ -1,6 +1,5 @@
 package tr.unvercanunlu.ride_share.service;
 
-import java.util.Set;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
 import tr.unvercanunlu.ride_share.entity.Ride;
@@ -26,7 +25,7 @@ public interface ValidationService {
 
   void checkPassengerExists(UUID passengerId) throws NotFoundException;
 
-  void checkRideStatus(Set<RideStatus> expected, Ride ride) throws NotExpectedRideStatusException;
+  void checkRideTransition(Ride ride, RideStatus nextStatus) throws NotExpectedRideStatusException;
 
   void checkDriverPresent(Ride ride) throws DriverMissingException;
 
@@ -35,4 +34,5 @@ public interface ValidationService {
   void checkRideCompleted(Ride ride) throws RideAlreadyCompletedException;
 
   void checkRideAccepted(Ride ride) throws RideAlreadyAcceptedException;
+
 }

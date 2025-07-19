@@ -2,7 +2,9 @@ package tr.unvercanunlu.ride_share.status;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
+@ToString
 @RequiredArgsConstructor
 public enum DriverStatus {
 

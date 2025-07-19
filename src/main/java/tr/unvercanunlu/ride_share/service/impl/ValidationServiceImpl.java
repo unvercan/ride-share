@@ -1,6 +1,5 @@
 package tr.unvercanunlu.ride_share.service.impl;
 
-import java.util.Set;
 import java.util.UUID;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
 import tr.unvercanunlu.ride_share.dao.DriverRepository;
@@ -38,6 +37,8 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void checkNoActiveRideForDriver(UUID driverId) throws HasActiveRideException {
+    checkIdentifier(driverId, Driver.class);
+
     if (rideRepository.checkActiveRideExistsForDriver(driverId)) {
       throw new HasActiveRideException(Driver.class, driverId);
     }
@@ -45,6 +46,8 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void checkNoActiveRideForPassenger(UUID passengerId) throws HasActiveRideException {
+    checkIdentifier(passengerId, Passenger.class);
+
     if (rideRepository.checkActiveRideExistsForPassenger(passengerId)) {
       throw new HasActiveRideException(Passenger.class, passengerId);
     }
@@ -52,6 +55,8 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void checkDriverAvailable(UUID driverId) throws DriverUnavailableException {
+    checkIdentifier(driverId, Driver.class);
+
     if (!driverRepository.checkAvailable(driverId)) {
       throw new DriverUnavailableException(driverId);
     }
@@ -66,18 +71,22 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void checkPassengerExists(UUID passengerId) throws NotFoundException {
+    checkIdentifier(passengerId, Passenger.class);
+
     if (!passengerRepository.checkExists(passengerId)) {
       throw new NotFoundException(Passenger.class, passengerId);
     }
   }
 
+  // todo
   @Override
-  public void checkRideStatus(Set<RideStatus> expected, Ride ride) throws NotExpectedRideStatusException {
-    if ((ride != null) && !expected.contains(ride.getStatus())) {
-      throw new NotExpectedRideStatusException(ride.getId(), expected, ride.getStatus());
+  public void checkRideTransition(Ride ride, RideStatus nextStatus) throws NotExpectedRideStatusException {
+    if ((ride != null) && (ride.getStatus() != null) && (nextStatus != null) && !ride.getStatus().canTransitionTo(nextStatus)) {
+      throw new NotExpectedRideStatusException(ride.getId(), ride.getStatus().getAllowedTransitions(), nextStatus);
     }
   }
 
+  // todo
   @Override
   public void checkDriverPresent(Ride ride) throws DriverMissingException {
     if ((ride != null) && (ride.getDriverId() == null)) {
@@ -87,18 +96,22 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void checkDriverExists(UUID driverId) throws NotFoundException {
+    checkIdentifier(driverId, Driver.class);
+
     if (!driverRepository.checkExists(driverId)) {
       throw new NotFoundException(Driver.class, driverId);
     }
   }
 
+  // todo
   @Override
   public void checkRideCompleted(Ride ride) throws RideAlreadyCompletedException {
-    if ((ride != null) && RideStatus.COMPLETED.equals(ride.getStatus())) {
+    if ((ride != null) && (ride.getStatus() != null) && RideStatus.COMPLETED.equals(ride.getStatus())) {
       throw new RideAlreadyCompletedException(ride.getId());
     }
   }
 
+  // todo
   @Override
   public void checkRideAccepted(Ride ride) throws RideAlreadyAcceptedException {
     if ((ride != null) && (ride.getDriverId() != null)) {

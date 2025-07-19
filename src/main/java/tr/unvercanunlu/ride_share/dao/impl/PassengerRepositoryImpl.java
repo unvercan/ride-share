@@ -9,9 +9,7 @@ public class PassengerRepositoryImpl extends InMemoryDaoImpl<Passenger> implemen
 
   @Override
   public boolean checkExists(UUID passengerId) {
-    return entities.values()
-        .stream()
-        .anyMatch(passenger -> passenger.getId().equals(passengerId));
+    return (passengerId != null) && entities.containsKey(passengerId);
   }
 
 }

@@ -15,9 +15,8 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
 
   @Override
   public Optional<T> get(UUID id) {
-    return Optional.ofNullable(
-        entities.get(id)
-    );
+    return Optional.ofNullable(id)
+        .map(entities::get);
   }
 
   @Override
@@ -27,21 +26,26 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
 
   @Override
   public T save(T entity) {
+    if (entity == null) {
+      return null;
+    }
+
     ensureId(entity);
-
     entities.put(entity.getId(), entity);
-
     return entity;
   }
 
   @Override
   public void remove(UUID id) {
-    entities.remove(id);
+    if (id != null) {
+      entities.remove(id);
+    }
   }
 
-  protected void ensureId(T entity) {
-    if (entity.getId() == null) {
-      entity.setId(UUID.randomUUID());
+  private void ensureId(T entity) {
+    if ((entity != null) && (entity.getId() == null)) {
+      UUID id = UUID.randomUUID();
+      entity.setId(id);
     }
   }
 

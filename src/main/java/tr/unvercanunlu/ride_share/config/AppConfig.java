@@ -17,6 +17,7 @@ public class AppConfig {
   public static final Set<RideStatus> ACTIVE_RIDE_STATUSES = Set.of(
       RideStatus.REQUESTED,
       RideStatus.ACCEPTED,
+      RideStatus.APPROVED,
       RideStatus.STARTED
   );
 

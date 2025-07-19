@@ -10,30 +10,26 @@ public class DriverRepositoryImpl extends InMemoryDaoImpl<Driver> implements Dri
 
   @Override
   public boolean checkAvailable(UUID driverId) {
-    return entities.values()
-        .stream()
-        .anyMatch(driver -> driver.getId().equals(driverId) && driver.getStatus().equals(DriverStatus.AVAILABLE));
+    return (driverId != null) && entities.containsKey(driverId) && DriverStatus.AVAILABLE.equals(entities.get(driverId).getStatus());
   }
 
   @Override
   public void updateAsAvailable(UUID driverId) {
-    if (entities.containsKey(driverId)) {
+    if ((driverId != null) && entities.containsKey(driverId)) {
       entities.get(driverId).setStatus(DriverStatus.AVAILABLE);
     }
   }
 
   @Override
   public void updateAsBusy(UUID driverId) {
-    if (entities.containsKey(driverId)) {
+    if ((driverId != null) && entities.containsKey(driverId)) {
       entities.get(driverId).setStatus(DriverStatus.BUSY);
     }
   }
 
   @Override
   public boolean checkExists(UUID driverId) {
-    return entities.values()
-        .stream()
-        .anyMatch(driver -> driver.getId().equals(driverId));
+    return (driverId != null) && entities.containsKey(driverId);
   }
 
 }

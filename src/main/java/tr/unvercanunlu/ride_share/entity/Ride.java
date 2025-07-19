@@ -5,10 +5,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
+@ToString
 @Getter
 @Setter
 public class Ride extends BaseEntity<UUID> {
