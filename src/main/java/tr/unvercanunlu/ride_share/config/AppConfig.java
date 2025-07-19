@@ -21,4 +21,6 @@ public class AppConfig {
       RideStatus.STARTED
   );
 
+  public static final boolean DEBUG_ENABLED = false;
+
 }
