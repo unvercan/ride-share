@@ -12,9 +12,9 @@ public class CalculationServiceImpl implements CalculationService {
   public BigDecimal calculatePrice(double distance) {
     if (distance < 0) {
       LogHelper.error(this.getClass(),
-          String.format("Distance cannot be negative: distance=%f", distance));
+          String.format("Invalid distance for price calculation: distance=%.2f", distance));
 
-      throw new IllegalArgumentException("Distance cannot be negative: %f".formatted(distance));
+      throw new IllegalArgumentException("Distance cannot be negative: %.2f".formatted(distance));
     }
 
     try {
@@ -23,17 +23,16 @@ public class CalculationServiceImpl implements CalculationService {
       ).setScale(2, RoundingMode.HALF_UP);
 
       LogHelper.info(this.getClass(),
-          String.format("Price calculated. distance=%f price=%f", distance, price));
+          String.format("Calculated price for ride: distance=%.2f, price=%s", distance, price));
 
       return price;
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to calculate price. distance=%f, error=%s", distance, e.getMessage()));
+          String.format("Error calculating price: distance=%.2f, error=%s", distance, e.getMessage()));
 
       throw e;
     }
-
   }
 
 }
