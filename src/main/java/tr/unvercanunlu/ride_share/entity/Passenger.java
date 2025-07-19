@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import tr.unvercanunlu.ride_share.core.BaseEntity;
-import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 
 @ToString
 @Getter
@@ -15,16 +14,5 @@ public class Passenger extends BaseEntity<UUID> implements Person {
   private String name;
   private String email;
   private String phone;
-
-  // factory method
-  public static Passenger of(RegisterPassengerDto request) {
-    Passenger passenger = new Passenger();
-
-    passenger.setName(request.name());
-    passenger.setEmail(request.email());
-    passenger.setPhone(request.phone());
-
-    return passenger;
-  }
 
 }
