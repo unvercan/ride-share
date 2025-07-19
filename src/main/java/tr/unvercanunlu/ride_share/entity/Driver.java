@@ -20,6 +20,7 @@ public class Driver extends BaseEntity<UUID> implements Person {
   private Location current;
   private DriverStatus status;
 
+  // factory method
   public static Driver of(RegisterDriverDto request) {
     Driver driver = new Driver();
 

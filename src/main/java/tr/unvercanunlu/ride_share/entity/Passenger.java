@@ -16,6 +16,7 @@ public class Passenger extends BaseEntity<UUID> implements Person {
   private String email;
   private String phone;
 
+  // factory method
   public static Passenger of(RegisterPassengerDto request) {
     Passenger passenger = new Passenger();
 

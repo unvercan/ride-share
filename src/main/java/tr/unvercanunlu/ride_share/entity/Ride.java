@@ -32,6 +32,7 @@ public class Ride extends BaseEntity<UUID> {
   private LocalDateTime completedAt;
   private LocalDateTime canceledAt;
 
+  // factory method
   public static Ride of(RequestRideDto request) {
     Ride ride = new Ride();
 
