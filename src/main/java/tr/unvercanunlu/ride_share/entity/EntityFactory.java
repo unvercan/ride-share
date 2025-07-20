@@ -27,7 +27,8 @@ public class EntityFactory {
     driver.setPlate(request.plate());
     driver.setStatus(DriverStatus.OFFLINE);
 
-    LogHelper.info(EntityFactory.class, String.format("New Driver entity created: driver=%s", driver));
+    LogHelper.info(EntityFactory.class,
+        String.format("New Driver entity created: driver=%s", driver));
 
     return driver;
   }
@@ -45,7 +46,8 @@ public class EntityFactory {
     passenger.setEmail(request.email());
     passenger.setPhone(request.phone());
 
-    LogHelper.info(EntityFactory.class, String.format("New Passenger entity created: passenger=%s", passenger));
+    LogHelper.info(EntityFactory.class,
+        String.format("New Passenger entity created: passenger=%s", passenger));
 
     return passenger;
   }
@@ -64,7 +66,8 @@ public class EntityFactory {
     ride.setDropOff(request.dropOff());
     ride.setStatus(RideStatus.REQUESTED);
 
-    LogHelper.info(EntityFactory.class, String.format("New Ride entity created: ride=%s", ride));
+    LogHelper.info(EntityFactory.class,
+        String.format("New Ride entity created: ride=%s", ride));
 
     return ride;
   }

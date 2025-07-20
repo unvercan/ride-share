@@ -10,7 +10,6 @@ import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 import tr.unvercanunlu.ride_share.exception.NotExpectedRideStatusException;
 import tr.unvercanunlu.ride_share.exception.NotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideAlreadyAcceptedException;
-import tr.unvercanunlu.ride_share.exception.RideAlreadyCompletedException;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 public interface ValidationService {
@@ -30,8 +29,6 @@ public interface ValidationService {
   void checkDriverPresent(Ride ride) throws DriverMissingException;
 
   void checkDriverExists(UUID driverId) throws NotFoundException;
-
-  void checkRideCompleted(Ride ride) throws RideAlreadyCompletedException;
 
   void checkRideAccepted(Ride ride) throws RideAlreadyAcceptedException;
 

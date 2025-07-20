@@ -18,7 +18,8 @@ public enum RideStatus {
   APPROVED('P'),
   STARTED('S'),
   COMPLETED('C'),
-  CANCELED('X');
+  CANCELED('X'),
+  EXPIRED('E');
 
   @Getter
   private final char code;
@@ -28,22 +29,27 @@ public enum RideStatus {
   static {
     Map<RideStatus, Set<RideStatus>> map = new EnumMap<>(RideStatus.class);
 
-    map.put(REQUESTED, EnumSet.of(ACCEPTED, CANCELED));
+    map.put(REQUESTED, EnumSet.of(ACCEPTED, CANCELED, EXPIRED));
     map.put(ACCEPTED, EnumSet.of(APPROVED, REQUESTED, CANCELED));
     map.put(APPROVED, EnumSet.of(STARTED, CANCELED));
     map.put(STARTED, EnumSet.of(COMPLETED, CANCELED));
     map.put(COMPLETED, Collections.emptySet());
     map.put(CANCELED, Collections.emptySet());
+    map.put(EXPIRED, Collections.emptySet());
 
     TRANSITIONS = Collections.unmodifiableMap(map);
   }
 
   public boolean canTransitionTo(RideStatus next) {
-    return (next != null) && TRANSITIONS.get(this).contains(next);
+    if ((next != null) && TRANSITIONS.containsKey(this)) {
+      return TRANSITIONS.get(this).contains(next);
+    }
+
+    return false;
   }
 
   public Set<RideStatus> getAllowedTransitions() {
-    return TRANSITIONS.get(this);
+    return Collections.unmodifiableSet(TRANSITIONS.get(this));
   }
 
 }
