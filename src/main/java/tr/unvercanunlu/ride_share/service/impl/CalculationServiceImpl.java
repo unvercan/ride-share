@@ -29,7 +29,7 @@ public class CalculationServiceImpl implements CalculationService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Error calculating price: distance=%.2f, error=%s", distance, e.getMessage()));
+          String.format("Error calculating price: distance=%.2f, error=%s", distance, e.getMessage()), e);
 
       throw e;
     }

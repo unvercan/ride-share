@@ -36,7 +36,7 @@ public class DriverServiceImpl implements DriverService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to register driver: email=%s, error=%s", request.email(), e.getMessage()));
+          String.format("Failed to register driver: email=%s, error=%s", request.email(), e.getMessage()), e);
 
       throw e;
     }
@@ -60,7 +60,7 @@ public class DriverServiceImpl implements DriverService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to update driver location: driverId=%s, error=%s", request.driverId(), e.getMessage()));
+          String.format("Failed to update driver location: driverId=%s, error=%s", request.driverId(), e.getMessage()), e);
 
       throw e;
     }
@@ -85,7 +85,7 @@ public class DriverServiceImpl implements DriverService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to set driver offline: driverId=%s, error=%s", driverId, e.getMessage()));
+          String.format("Failed to set driver offline: driverId=%s, error=%s", driverId, e.getMessage()), e);
 
       throw e;
     }
@@ -110,7 +110,7 @@ public class DriverServiceImpl implements DriverService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to set driver available: driverId=%s, error=%s", driverId, e.getMessage()));
+          String.format("Failed to set driver available: driverId=%s, error=%s", driverId, e.getMessage()), e);
 
       throw e;
     }
@@ -133,7 +133,7 @@ public class DriverServiceImpl implements DriverService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to retrieve driver details: driverId=%s, error=%s", driverId, e.getMessage()));
+          String.format("Failed to retrieve driver details: driverId=%s, error=%s", driverId, e.getMessage()), e);
 
       throw e;
     }

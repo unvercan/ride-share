@@ -16,6 +16,14 @@ public class LogHelper {
     logError(AppConfig.LOG_FORMAT.formatted(LocalDateTime.now(), LogLevel.ERROR.name(), source.getSimpleName(), message));
   }
 
+  public static void error(Class<?> source, String message, Throwable e) {
+    logError(AppConfig.LOG_FORMAT.formatted(LocalDateTime.now(), LogLevel.ERROR.name(), source.getSimpleName(), message));
+
+    if (e != null) {
+      e.printStackTrace();
+    }
+  }
+
   public static void debug(Class<?> source, String message) {
     if (AppConfig.DEBUG_ENABLED) {
       log(AppConfig.LOG_FORMAT.formatted(LocalDateTime.now(), LogLevel.DEBUG.name(), source.getSimpleName(), message));

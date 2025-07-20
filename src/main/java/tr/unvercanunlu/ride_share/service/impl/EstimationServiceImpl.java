@@ -29,7 +29,7 @@ public class EstimationServiceImpl implements EstimationService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to estimate duration: pickup=%s, dropOff=%s, error=%s", pickup, dropOff, e.getMessage()));
+          String.format("Failed to estimate duration: pickup=%s, dropOff=%s, error=%s", pickup, dropOff, e.getMessage()), e);
 
       throw e;
     }
@@ -55,7 +55,7 @@ public class EstimationServiceImpl implements EstimationService {
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
           String.format("Failed to estimate full trip: pickup=%s, dropOff=%s, current=%s, from=%s, error=%s",
-              pickup, dropOff, current, from, e.getMessage()));
+              pickup, dropOff, current, from, e.getMessage()), e);
 
       throw e;
     }
@@ -77,7 +77,7 @@ public class EstimationServiceImpl implements EstimationService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to estimate completion: pickup=%s, dropOff=%s, pickupAt=%s, error=%s", pickup, dropOff, pickupAt, e.getMessage()));
+          String.format("Failed to estimate completion: pickup=%s, dropOff=%s, pickupAt=%s, error=%s", pickup, dropOff, pickupAt, e.getMessage()), e);
 
       throw e;
     }

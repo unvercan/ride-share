@@ -33,7 +33,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to register passenger: error=%s", e.getMessage()));
+          String.format("Failed to register passenger: error=%s", e.getMessage()), e);
 
       throw e;
     }
@@ -57,7 +57,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to retrieve passenger detail: passengerId=%s error=%s", passengerId, e.getMessage()));
+          String.format("Failed to retrieve passenger detail: passengerId=%s error=%s", passengerId, e.getMessage()), e);
 
       throw e;
     }

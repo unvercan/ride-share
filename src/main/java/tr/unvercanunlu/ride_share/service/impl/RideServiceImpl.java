@@ -77,7 +77,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to request ride. passengerId=%s, error=%s", request.passengerId(), e.getMessage()));
+          String.format("Failed to request ride. passengerId=%s, error=%s", request.passengerId(), e.getMessage()), e);
 
       throw e;
     }
@@ -162,7 +162,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to accept ride. rideId=%s, driverId=%s, error=%s", request.rideId(), request.driverId(), e.getMessage()));
+          String.format("Failed to accept ride. rideId=%s, driverId=%s, error=%s", request.rideId(), request.driverId(), e.getMessage()), e);
 
       throw e;
     }
@@ -197,7 +197,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to approve ride. rideId=%s, error=%s", rideId, e.getMessage()));
+          String.format("Failed to approve ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
 
       throw e;
     }
@@ -240,7 +240,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to disapprove ride. rideId=%s, error=%s", rideId, e.getMessage()));
+          String.format("Failed to disapprove ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
 
       throw e;
     }
@@ -281,7 +281,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to pickup passenger. rideId=%s, error=%s", rideId, e.getMessage()));
+          String.format("Failed to pickup passenger. rideId=%s, error=%s", rideId, e.getMessage()), e);
 
       throw e;
     }
@@ -317,7 +317,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to complete ride. rideId=%s, error=%s", rideId, e.getMessage()));
+          String.format("Failed to complete ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
 
       throw e;
     }
@@ -351,7 +351,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to cancel ride. rideId=%s, error=%s", rideId, e.getMessage()));
+          String.format("Failed to cancel ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
 
       throw e;
     }
@@ -375,7 +375,7 @@ public class RideServiceImpl implements RideService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to get ride detail. rideId=%s, error=%s", rideId, e.getMessage()));
+          String.format("Failed to get ride detail. rideId=%s, error=%s", rideId, e.getMessage()), e);
 
       throw e;
     }

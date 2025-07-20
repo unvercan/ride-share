@@ -23,7 +23,7 @@ public class GeoServiceImpl implements GeoService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to calculate distance: start=%s, end=%s, error=%s", start, end, e.getMessage()));
+          String.format("Failed to calculate distance: start=%s, end=%s, error=%s", start, end, e.getMessage()), e);
 
       throw e;
     }
@@ -44,7 +44,7 @@ public class GeoServiceImpl implements GeoService {
 
     } catch (Exception e) {
       LogHelper.error(this.getClass(),
-          String.format("Failed to estimate duration: start=%s, end=%s, error=%s", start, end, e.getMessage()));
+          String.format("Failed to estimate duration: start=%s, end=%s, error=%s", start, end, e.getMessage()), e);
 
       throw e;
     }
