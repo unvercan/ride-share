@@ -22,14 +22,13 @@ public class EntityFactory {
     }
 
     Driver driver = new Driver();
-
     driver.setName(request.name());
     driver.setEmail(request.email());
     driver.setPhone(request.phone());
     driver.setPlate(request.plate());
     driver.setStatus(DriverStatus.OFFLINE);
 
-    logger.info(String.format("New Driver entity created: driver=%s", driver));
+    logger.info("New Driver entity created: driver=%s".formatted(driver));
     return driver;
   }
 
@@ -40,12 +39,11 @@ public class EntityFactory {
     }
 
     Passenger passenger = new Passenger();
-
     passenger.setName(request.name());
     passenger.setEmail(request.email());
     passenger.setPhone(request.phone());
 
-    logger.info(String.format("New Passenger entity created: passenger=%s", passenger));
+    logger.info("New Passenger entity created: passenger=%s".formatted(passenger));
     return passenger;
   }
 
@@ -56,13 +54,12 @@ public class EntityFactory {
     }
 
     Ride ride = new Ride();
-
     ride.setPassengerId(request.passengerId());
     ride.setPickup(request.pickup());
     ride.setDropOff(request.dropOff());
     ride.setStatus(RideStatus.REQUESTED);
 
-    logger.info(String.format("New Ride entity created: ride=%s", ride));
+    logger.info("New Ride entity created: ride=%s".formatted(ride));
     return ride;
   }
 

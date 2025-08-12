@@ -13,28 +13,28 @@ public class RandomGeoServiceImpl implements GeoService {
 
   @Override
   public double calculateDistance(Location start, Location end) {
-    logger.info(String.format("Calculating distance: start=%s, end=%s", start, end));
+    logger.info("Calculating distance: start=%s, end=%s".formatted(start, end));
 
     try {
       double distance = getRandom().nextInt(3, 50);
-      logger.info(String.format("Distance calculated: start=%s, end=%s, distance=%.2f", start, end, distance));
+      logger.info("Distance calculated: start=%s, end=%s, distance=%.2f".formatted(start, end, distance));
       return distance;
     } catch (Exception e) {
-      logger.error(String.format("Failed to calculate distance: start=%s, end=%s, error=%s", start, end, e.getMessage()), e);
+      logger.error("Failed to calculate distance: start=%s, end=%s, error=%s".formatted(start, end, e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public int estimateDuration(Location start, Location end) {
-    logger.info(String.format("Estimating duration: start=%s, end=%s", start, end));
+    logger.info("Estimating duration: start=%s, end=%s".formatted(start, end));
 
     try {
       int duration = getRandom().nextInt(3, 50);
-      logger.info(String.format("Duration estimated: start=%s, end=%s, duration=%d", start, end, duration));
+      logger.info("Duration estimated: start=%s, end=%s, duration=%d".formatted(start, end, duration));
       return duration;
     } catch (Exception e) {
-      logger.error(String.format("Failed to estimate duration: start=%s, end=%s, error=%s", start, end, e.getMessage()), e);
+      logger.error("Failed to estimate duration: start=%s, end=%s, error=%s".formatted(start, end, e.getMessage()), e);
       throw e;
     }
   }

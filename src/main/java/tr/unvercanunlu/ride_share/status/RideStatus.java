@@ -28,7 +28,6 @@ public enum RideStatus {
 
   static {
     Map<RideStatus, Set<RideStatus>> map = new EnumMap<>(RideStatus.class);
-
     map.put(REQUESTED, EnumSet.of(ACCEPTED, CANCELED, EXPIRED));
     map.put(ACCEPTED, EnumSet.of(APPROVED, REQUESTED, CANCELED));
     map.put(APPROVED, EnumSet.of(STARTED, CANCELED));

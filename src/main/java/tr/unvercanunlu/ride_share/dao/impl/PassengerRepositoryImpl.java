@@ -14,7 +14,7 @@ public class PassengerRepositoryImpl extends InMemoryDaoImpl<Passenger> implemen
   @Override
   public boolean existsById(UUID passengerId) {
     boolean exists = (passengerId != null) && entities.containsKey(passengerId);
-    logger.debug(String.format("Checked existence for passengerId=%s. Exists=%b", passengerId, exists));
+    logger.debug("Checked existence for passengerId=%s. Exists=%b".formatted(passengerId, exists));
     return exists;
   }
 

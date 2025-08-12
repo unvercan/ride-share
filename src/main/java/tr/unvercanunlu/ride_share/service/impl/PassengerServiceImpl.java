@@ -23,13 +23,13 @@ public class PassengerServiceImpl implements PassengerService {
   @Override
   public Passenger register(RegisterPassengerDto request) {
     try {
-      logger.info(String.format("Registering passenger: email=%s", request.email()));
+      logger.info("Registering passenger: email=%s".formatted(request.email()));
       Passenger passenger = EntityFactory.from(request);
       passenger = passengerRepository.save(passenger);
-      logger.info(String.format("Passenger registered: email=%s id=%s", request.email(), passenger.getId()));
+      logger.info("Passenger registered: email=%s id=%s".formatted(request.email(), passenger.getId()));
       return passenger;
     } catch (Exception e) {
-      logger.error(String.format("Failed to register passenger: error=%s", e.getMessage()), e);
+      logger.error("Failed to register passenger: error=%s".formatted(e.getMessage()), e);
       throw e;
     }
   }
@@ -37,13 +37,13 @@ public class PassengerServiceImpl implements PassengerService {
   @Override
   public Passenger getPassenger(UUID passengerId) throws NotFoundException {
     try {
-      logger.info(String.format("Retrieving passenger detail: passengerId=%s", passengerId));
+      logger.info("Retrieving passenger detail: passengerId=%s".formatted(passengerId));
       validationService.checkIdentifier(passengerId, Passenger.class);
       Passenger passenger = passengerRepository.findById(passengerId).orElseThrow(() -> new NotFoundException(Passenger.class, passengerId));
-      logger.info(String.format("Passenger detail retrieved: passengerId=%s", passengerId));
+      logger.info("Passenger detail retrieved: passengerId=%s".formatted(passengerId));
       return passenger;
     } catch (Exception e) {
-      logger.error(String.format("Failed to retrieve passenger detail: passengerId=%s error=%s", passengerId, e.getMessage()), e);
+      logger.error("Failed to retrieve passenger detail: passengerId=%s error=%s".formatted(passengerId, e.getMessage()), e);
       throw e;
     }
   }

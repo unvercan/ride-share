@@ -18,7 +18,7 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
 
   @Override
   public List<Ride> findRequestedWithinWindow(LocalDateTime windowStart, LocalDateTime windowEnd) {
-    logger.debug(String.format("Getting requested rides between %s and %s", windowStart, windowEnd));
+    logger.debug("Getting requested rides between %s and %s".formatted(windowStart, windowEnd));
     if ((windowStart == null) || (windowEnd == null)) {
       logger.error("Gap start or end is null!");
       return List.of();
@@ -32,13 +32,13 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> !ride.getRequestedAt().isBefore(windowStart) && !ride.getRequestedAt().isAfter(windowEnd))
         .toList();
 
-    logger.debug(String.format("Found %d requested rides in gap", rides.size()));
+    logger.debug("Found %d requested rides in gap".formatted(rides.size()));
     return rides;
   }
 
   @Override
   public List<Ride> findAllByDriverId(UUID driverId) {
-    logger.debug(String.format("Getting rides by driverId=%s", driverId));
+    logger.debug("Getting rides by driverId=%s".formatted(driverId));
     if (driverId == null) {
       logger.error("driverId is null!");
       return List.of();
@@ -50,13 +50,13 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> driverId.equals(ride.getDriverId()))
         .toList();
 
-    logger.debug(String.format("Found %d rides for driverId=%s", rides.size(), driverId));
+    logger.debug("Found %d rides for driverId=%s".formatted(rides.size(), driverId));
     return rides;
   }
 
   @Override
   public List<Ride> findAllByPassengerId(UUID passengerId) {
-    logger.debug(String.format("Getting rides by passengerId=%s", passengerId));
+    logger.debug("Getting rides by passengerId=%s".formatted(passengerId));
     if (passengerId == null) {
       logger.error("passengerId is null!");
       return List.of();
@@ -68,7 +68,7 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> passengerId.equals(ride.getPassengerId()))
         .toList();
 
-    logger.debug(String.format("Found %d rides for passengerId=%s", rides.size(), passengerId));
+    logger.debug("Found %d rides for passengerId=%s".formatted(rides.size(), passengerId));
     return rides;
   }
 
@@ -80,7 +80,7 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> ride.getStatus() != null)
         .anyMatch(ride -> ACTIVE_RIDE_STATES.contains(ride.getStatus()));
 
-    logger.debug(String.format("Active ride exists for passengerId=%s: %b", passengerId, exists));
+    logger.debug("Active ride exists for passengerId=%s: %b".formatted(passengerId, exists));
     return exists;
   }
 
@@ -92,7 +92,7 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> ride.getStatus() != null)
         .anyMatch(ride -> ACTIVE_RIDE_STATES.contains(ride.getStatus()));
 
-    logger.debug(String.format("Active ride exists for driverId=%s: %b", driverId, exists));
+    logger.debug("Active ride exists for driverId=%s: %b".formatted(driverId, exists));
     return exists;
   }
 

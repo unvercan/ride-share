@@ -21,16 +21,16 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
   public Optional<T> findById(UUID id) {
     Optional<T> result = Optional.ofNullable(id).map(entities::get);
     if (result.isPresent()) {
-      logger.info(String.format("Entity found: id=%s, entity=%s", id, result.get()));
+      logger.info("Entity found: id=%s, entity=%s".formatted(id, result.get()));
     } else {
-      logger.debug(String.format("Entity not found: id=%s", id));
+      logger.debug("Entity not found: id=%s".formatted(id));
     }
     return result;
   }
 
   @Override
   public List<T> findAll() {
-    logger.debug(String.format("Retrieving all entities. Count=%d", entities.size()));
+    logger.debug("Retrieving all entities. Count=%d".formatted(entities.size()));
     return new ArrayList<>(entities.values());
   }
 
@@ -42,7 +42,7 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
     }
     ensureId(entity);
     entities.put(entity.getId(), entity);
-    logger.info(String.format("Entity saved: id=%s, entity=%s", entity.getId(), entity));
+    logger.info("Entity saved: id=%s, entity=%s".formatted(entity.getId(), entity));
     return entity;
   }
 
@@ -51,9 +51,9 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
     if (id != null) {
       T removed = entities.remove(id);
       if (removed != null) {
-        logger.info(String.format("Entity removed: id=%s, entity=%s", id, removed));
+        logger.info("Entity removed: id=%s, entity=%s".formatted(id, removed));
       } else {
-        logger.debug(String.format("Attempted to remove entity, but not found: id=%s", id));
+        logger.debug("Attempted to remove entity, but not found: id=%s".formatted(id));
       }
     } else {
       logger.error("Attempted to remove entity with null id.");
@@ -64,7 +64,7 @@ public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao
     if ((entity != null) && (entity.getId() == null)) {
       UUID id = UUID.randomUUID();
       entity.setId(id);
-      logger.debug(String.format("Assigned new id to entity: id=%s, entity=%s", id, entity));
+      logger.debug("Assigned new id to entity: id=%s, entity=%s".formatted(id, entity));
     }
   }
 

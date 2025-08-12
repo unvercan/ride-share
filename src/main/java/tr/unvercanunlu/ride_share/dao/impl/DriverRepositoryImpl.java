@@ -15,7 +15,7 @@ public class DriverRepositoryImpl extends InMemoryDaoImpl<Driver> implements Dri
   @Override
   public boolean isAvailable(UUID driverId) {
     boolean available = (driverId != null) && entities.containsKey(driverId) && DriverStatus.AVAILABLE.equals(entities.get(driverId).getStatus());
-    logger.debug(String.format("Checked availability for driverId=%s. Available=%b", driverId, available));
+    logger.debug("Checked availability for driverId=%s. Available=%b".formatted(driverId, available));
     return available;
   }
 
@@ -23,9 +23,9 @@ public class DriverRepositoryImpl extends InMemoryDaoImpl<Driver> implements Dri
   public void setAvailable(UUID driverId) {
     if ((driverId != null) && entities.containsKey(driverId)) {
       entities.get(driverId).setStatus(DriverStatus.AVAILABLE);
-      logger.info(String.format("Updated driver as AVAILABLE. driverId=%s", driverId));
+      logger.info("Updated driver as AVAILABLE. driverId=%s".formatted(driverId));
     } else {
-      logger.error(String.format("Failed to update as AVAILABLE. driverId=%s not found.", driverId));
+      logger.error("Failed to update as AVAILABLE. driverId=%s not found.".formatted(driverId));
     }
   }
 
@@ -33,16 +33,16 @@ public class DriverRepositoryImpl extends InMemoryDaoImpl<Driver> implements Dri
   public void setBusy(UUID driverId) {
     if ((driverId != null) && entities.containsKey(driverId)) {
       entities.get(driverId).setStatus(DriverStatus.BUSY);
-      logger.info(String.format("Updated driver as BUSY. driverId=%s", driverId));
+      logger.info("Updated driver as BUSY. driverId=%s".formatted(driverId));
     } else {
-      logger.error(String.format("Failed to update as BUSY. driverId=%s not found.", driverId));
+      logger.error("Failed to update as BUSY. driverId=%s not found.".formatted(driverId));
     }
   }
 
   @Override
   public boolean existsById(UUID driverId) {
     boolean exists = (driverId != null) && entities.containsKey(driverId);
-    logger.debug(String.format("Checked existence for driverId=%s. Exists=%b", driverId, exists));
+    logger.debug("Checked existence for driverId=%s. Exists=%b".formatted(driverId, exists));
     return exists;
   }
 

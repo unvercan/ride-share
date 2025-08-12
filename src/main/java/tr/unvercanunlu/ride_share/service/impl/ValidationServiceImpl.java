@@ -35,7 +35,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(driverId, Driver.class);
 
     if (rideRepository.existsActiveByDriverId(driverId)) {
-      logger.error(String.format("Driver has active ride: driverId=%s", driverId));
+      logger.error("Driver has active ride: driverId=%s".formatted(driverId));
       throw new HasActiveRideException(Driver.class, driverId);
     }
   }
@@ -45,7 +45,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(passengerId, Passenger.class);
 
     if (rideRepository.existsActiveByPassengerId(passengerId)) {
-      logger.error(String.format("Passenger has active ride: passengerId=%s", passengerId));
+      logger.error("Passenger has active ride: passengerId=%s".formatted(passengerId));
       throw new HasActiveRideException(Passenger.class, passengerId);
     }
   }
@@ -55,7 +55,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(driverId, Driver.class);
 
     if (!driverRepository.isAvailable(driverId)) {
-      logger.error(String.format("Driver unavailable: driverId=%s", driverId));
+      logger.error("Driver unavailable: driverId=%s".formatted(driverId));
       throw new DriverUnavailableException(driverId);
     }
   }
@@ -63,7 +63,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkIdentifier(UUID id, Class<? extends BaseEntity<?>> entityClass) throws IdentifierMissingException {
     if (id == null) {
-      logger.error(String.format("Identifier is null for entity: %s", entityClass.getSimpleName()));
+      logger.error("Identifier is null for entity: %s".formatted(entityClass.getSimpleName()));
       throw new IdentifierMissingException(entityClass);
     }
   }
@@ -73,7 +73,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(passengerId, Passenger.class);
 
     if (!passengerRepository.existsById(passengerId)) {
-      logger.error(String.format("Passenger not found: passengerId=%s", passengerId));
+      logger.error("Passenger not found: passengerId=%s".formatted(passengerId));
       throw new NotFoundException(Passenger.class, passengerId);
     }
   }
@@ -81,7 +81,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkRideTransition(Ride ride, RideStatus nextStatus) throws NotExpectedRideStatusException {
     if ((ride != null) && (ride.getStatus() != null) && (nextStatus != null) && !ride.getStatus().canTransitionTo(nextStatus)) {
-      logger.error(String.format("Invalid ride status transition: rideId=%s from=%s to=%s", ride.getId(), ride.getStatus(), nextStatus));
+      logger.error("Invalid ride status transition: rideId=%s from=%s to=%s".formatted(ride.getId(), ride.getStatus(), nextStatus));
       throw new NotExpectedRideStatusException(ride.getId(), ride.getStatus().getAllowedTransitions(), nextStatus);
     }
   }
@@ -89,7 +89,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkDriverPresent(Ride ride) throws DriverMissingException {
     if ((ride != null) && (ride.getDriverId() == null)) {
-      logger.error(String.format("Driver is missing for ride: rideId=%s", ride.getId()));
+      logger.error("Driver is missing for ride: rideId=%s".formatted(ride.getId()));
       throw new DriverMissingException(ride.getId());
     }
   }
@@ -99,7 +99,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(driverId, Driver.class);
 
     if (!driverRepository.existsById(driverId)) {
-      logger.error(String.format("Driver not found: driverId=%s", driverId));
+      logger.error("Driver not found: driverId=%s".formatted(driverId));
       throw new NotFoundException(Driver.class, driverId);
     }
   }
@@ -107,7 +107,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkRideAccepted(Ride ride) throws RideAlreadyAcceptedException {
     if ((ride != null) && (ride.getDriverId() != null)) {
-      logger.error(String.format("Ride already accepted: rideId=%s", ride.getId()));
+      logger.error("Ride already accepted: rideId=%s".formatted(ride.getId()));
       throw new RideAlreadyAcceptedException(ride.getId());
     }
   }

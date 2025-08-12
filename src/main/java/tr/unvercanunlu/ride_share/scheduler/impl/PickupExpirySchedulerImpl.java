@@ -9,6 +9,7 @@ import tr.unvercanunlu.ride_share.dao.DriverRepository;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.helper.LoggerFactory;
+import tr.unvercanunlu.ride_share.helper.TimeHelper;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 public class PickupExpirySchedulerImpl extends AbstractScheduler {
@@ -24,7 +25,7 @@ public class PickupExpirySchedulerImpl extends AbstractScheduler {
 
   @Override
   protected void job() {
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = TimeHelper.now();
     int expiredCount = 0;
 
     try {
@@ -41,17 +42,17 @@ public class PickupExpirySchedulerImpl extends AbstractScheduler {
         rideRepository.save(ride);
         Optional.ofNullable(previousDriverId).ifPresent(driverRepository::setAvailable);
         expiredCount++;
-        logger.info(String.format("Ride pickup expired. rideId=%s", ride.getId()));
+        logger.info("Ride pickup expired. rideId=%s".formatted(ride.getId()));
       }
 
       if (expiredCount > 0) {
-        logger.info(String.format("Expired %d rides stuck in pickup at %s.", expiredCount, now));
+        logger.info("Expired %d rides stuck in pickup at %s.".formatted(expiredCount, now));
       } else {
-        logger.debug(String.format("No rides expired in pickup phase at %s.", now));
+        logger.debug("No rides expired in pickup phase at %s.".formatted(now));
       }
 
     } catch (Exception e) {
-      logger.error(String.format("Error occurred in PickupExpiryScheduler: %s", e.getMessage()), e);
+      logger.error("Error occurred in PickupExpiryScheduler: %s".formatted(e.getMessage()), e);
     }
   }
 

@@ -30,6 +30,7 @@ import tr.unvercanunlu.ride_share.entity.Passenger;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.exception.NotFoundException;
 import tr.unvercanunlu.ride_share.helper.LoggerFactory;
+import tr.unvercanunlu.ride_share.helper.TimeHelper;
 import tr.unvercanunlu.ride_share.service.CalculationService;
 import tr.unvercanunlu.ride_share.service.EstimationService;
 import tr.unvercanunlu.ride_share.service.GeoService;
@@ -52,7 +53,7 @@ public class RideServiceImpl implements RideService {
 
   @Override
   public RideRequestedDto requestRide(RequestRideDto request) {
-    logger.info(String.format("Starting new ride request. passengerId=%s", request.passengerId()));
+    logger.info("Starting new ride request. passengerId=%s".formatted(request.passengerId()));
 
     try {
       validationService.checkIdentifier(request.passengerId(), Passenger.class);
@@ -60,12 +61,12 @@ public class RideServiceImpl implements RideService {
       validationService.checkNoActiveRideForPassenger(request.passengerId());
 
       Ride ride = EntityFactory.from(request);
-      ride.setRequestedAt(LocalDateTime.now());
+      ride.setRequestedAt(TimeHelper.now());
       ride.setRequestEndAt(ride.getRequestedAt().plus(MAX_WAIT));
       ride.setDistance(geoService.calculateDistance(request.pickup(), request.dropOff()));
       ride.setFare(calculationService.calculatePrice(ride.getDistance()));
       ride = rideRepository.save(ride);
-      logger.info(String.format("Ride requested and saved successfully. rideId=%s", ride.getId()));
+      logger.info("Ride requested and saved successfully. rideId=%s".formatted(ride.getId()));
 
       EstimationDto estimation = null;
       if (ESTIMATION_ENABLED) {
@@ -77,15 +78,15 @@ public class RideServiceImpl implements RideService {
           ride.getFare(), ride.getRequestedAt(), ride.getRequestEndAt(), estimation
       );
     } catch (Exception e) {
-      logger.error(String.format("Failed to request ride. passengerId=%s, error=%s", request.passengerId(), e.getMessage()), e);
+      logger.error("Failed to request ride. passengerId=%s, error=%s".formatted(request.passengerId(), e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public List<NearRequestedRideDto> findNearestRequestedRides(Location current) {
-    logger.info(String.format("Finding nearest requested rides to location=%s", current));
-    LocalDateTime windowStart = LocalDateTime.now();
+    logger.info("Finding nearest requested rides to location=%s".formatted(current));
+    LocalDateTime windowStart = TimeHelper.now();
     LocalDateTime windowEnd = windowStart.plus(MAX_WAIT);
     List<Ride> requestedRides = rideRepository.findRequestedWithinWindow(windowStart, windowEnd);
     List<NearRequestedRideDto> nearRequestedRides = new ArrayList<>();
@@ -115,13 +116,13 @@ public class RideServiceImpl implements RideService {
       nearRequestedRides.add(nearRequestedRide);
     }
 
-    logger.info(String.format("Found %d nearby requested rides for location=%s", nearRequestedRides.size(), current));
+    logger.info("Found %d nearby requested rides for location=%s".formatted(nearRequestedRides.size(), current));
     return nearRequestedRides;
   }
 
   @Override
   public RideAcceptedDto acceptRide(AcceptRideDto request) {
-    logger.info(String.format("Starting ride acceptance. rideId=%s, driverId=%s", request.rideId(), request.driverId()));
+    logger.info("Starting ride acceptance. rideId=%s, driverId=%s".formatted(request.rideId(), request.driverId()));
 
     try {
       Ride ride = getRide(request.rideId());
@@ -132,12 +133,12 @@ public class RideServiceImpl implements RideService {
       validationService.checkNoActiveRideForDriver(request.driverId());
 
       ride.setDriverId(request.driverId());
-      ride.setAcceptedAt(LocalDateTime.now());
+      ride.setAcceptedAt(TimeHelper.now());
       ride.setStatus(RideStatus.ACCEPTED);
 
       ride = rideRepository.save(ride);
       driverRepository.setBusy(ride.getDriverId());
-      logger.info(String.format("Successfully accepted ride. rideId=%s, driverId=%s", ride.getId(), ride.getDriverId()));
+      logger.info("Successfully accepted ride. rideId=%s, driverId=%s".formatted(ride.getId(), ride.getDriverId()));
 
       EstimationDto estimation = null;
       if (ESTIMATION_ENABLED) {
@@ -150,14 +151,14 @@ public class RideServiceImpl implements RideService {
       );
 
     } catch (Exception e) {
-      logger.error(String.format("Failed to accept ride. rideId=%s, driverId=%s, error=%s", request.rideId(), request.driverId(), e.getMessage()), e);
+      logger.error("Failed to accept ride. rideId=%s, driverId=%s, error=%s".formatted(request.rideId(), request.driverId(), e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public DriverApprovedDto approveAssignedDriver(UUID rideId) {
-    logger.info(String.format("Approving ride. rideId=%s", rideId));
+    logger.info("Approving ride. rideId=%s".formatted(rideId));
 
     try {
       Ride ride = getRide(rideId);
@@ -166,12 +167,12 @@ public class RideServiceImpl implements RideService {
       validationService.checkDriverPresent(ride);
       validationService.checkDriverExists(ride.getDriverId());
 
-      ride.setApprovedAt(LocalDateTime.now());
+      ride.setApprovedAt(TimeHelper.now());
       ride.setStatus(RideStatus.APPROVED);
       ride = rideRepository.save(ride);
 
       driverRepository.setBusy(ride.getDriverId());
-      logger.info(String.format("Ride approved by passenger. rideId=%s", ride.getId()));
+      logger.info("Ride approved by passenger. rideId=%s".formatted(ride.getId()));
 
       return new DriverApprovedDto(
           ride.getId(), ride.getPassengerId(), ride.getDriverId(), ride.getPickup(), ride.getDropOff(),
@@ -179,14 +180,14 @@ public class RideServiceImpl implements RideService {
       );
 
     } catch (Exception e) {
-      logger.error(String.format("Failed to approve ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
+      logger.error("Failed to approve ride. rideId=%s, error=%s".formatted(rideId, e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public RideRequestedDto rejectAssignedDriver(UUID rideId) {
-    logger.info(String.format("Disapproving ride. rideId=%s", rideId));
+    logger.info("Disapproving ride. rideId=%s".formatted(rideId));
 
     try {
       Ride ride = getRide(rideId);
@@ -195,11 +196,11 @@ public class RideServiceImpl implements RideService {
       ride.setDriverId(null);
       ride.setAcceptedAt(null);
       ride.setStatus(RideStatus.REQUESTED);
-      ride.setRequestEndAt(LocalDateTime.now().plus(MAX_WAIT));
+      ride.setRequestEndAt(TimeHelper.now().plus(MAX_WAIT));
       ride = rideRepository.save(ride);
 
       Optional.ofNullable(previousDriverId).ifPresent(driverRepository::setAvailable);
-      logger.info(String.format("Ride disapproved by passenger. rideId=%s", ride.getId()));
+      logger.info("Ride disapproved by passenger. rideId=%s".formatted(ride.getId()));
 
       EstimationDto estimation = null;
       if (ESTIMATION_ENABLED) {
@@ -212,14 +213,14 @@ public class RideServiceImpl implements RideService {
       );
 
     } catch (Exception e) {
-      logger.error(String.format("Failed to disapprove ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
+      logger.error("Failed to disapprove ride. rideId=%s, error=%s".formatted(rideId, e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public PassengerPickupDto startTrip(UUID rideId) {
-    logger.info(String.format("Picking up passenger. rideId=%s", rideId));
+    logger.info("Picking up passenger. rideId=%s".formatted(rideId));
 
     try {
       Ride ride = getRide(rideId);
@@ -228,13 +229,13 @@ public class RideServiceImpl implements RideService {
       validationService.checkDriverPresent(ride);
       validationService.checkDriverExists(ride.getDriverId());
 
-      ride.setPickupAt(LocalDateTime.now());
+      ride.setPickupAt(TimeHelper.now());
       ride.setPickupEndAt(ride.getPickupAt().plus(MAX_WAIT));
       ride.setStatus(RideStatus.STARTED);
       ride = rideRepository.save(ride);
 
       driverRepository.setBusy(ride.getDriverId());
-      logger.info(String.format("Passenger picked up by driver. rideId=%s", ride.getId()));
+      logger.info("Passenger picked up by driver. rideId=%s".formatted(ride.getId()));
 
       EstimationDto estimation = null;
       if (ESTIMATION_ENABLED) {
@@ -247,7 +248,7 @@ public class RideServiceImpl implements RideService {
       );
 
     } catch (Exception e) {
-      logger.error(String.format("Failed to pickup passenger. rideId=%s, error=%s", rideId, e.getMessage()), e);
+      logger.error("Failed to pickup passenger. rideId=%s, error=%s".formatted(rideId, e.getMessage()), e);
 
       throw e;
     }
@@ -255,7 +256,7 @@ public class RideServiceImpl implements RideService {
 
   @Override
   public RideCompletedDto completeTrip(UUID rideId) {
-    logger.info(String.format("Completing ride. rideId=%s", rideId));
+    logger.info("Completing ride. rideId=%s".formatted(rideId));
 
     try {
       Ride ride = getRide(rideId);
@@ -264,13 +265,13 @@ public class RideServiceImpl implements RideService {
       validationService.checkDriverPresent(ride);
       validationService.checkDriverExists(ride.getDriverId());
 
-      ride.setCompletedAt(LocalDateTime.now());
+      ride.setCompletedAt(TimeHelper.now());
       ride.setDuration(Duration.between(ride.getPickupAt(), ride.getCompletedAt()).toMinutes());
       ride.setStatus(RideStatus.COMPLETED);
       ride = rideRepository.save(ride);
 
       driverRepository.setAvailable(ride.getDriverId());
-      logger.info(String.format("Ride completed. rideId=%s", ride.getId()));
+      logger.info("Ride completed. rideId=%s".formatted(ride.getId()));
 
       return new RideCompletedDto(
           ride.getId(), ride.getPassengerId(), ride.getDriverId(), ride.getPickup(), ride.getDropOff(), ride.getDistance(),
@@ -278,61 +279,61 @@ public class RideServiceImpl implements RideService {
       );
 
     } catch (Exception e) {
-      logger.error(String.format("Failed to complete ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
+      logger.error("Failed to complete ride. rideId=%s, error=%s".formatted(rideId, e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public RideCanceledDto cancelRide(UUID rideId) {
-    logger.info(String.format("Canceling ride. rideId=%s", rideId));
+    logger.info("Canceling ride. rideId=%s".formatted(rideId));
 
     try {
       Ride ride = getRide(rideId);
       validationService.checkRideTransition(ride, RideStatus.CANCELED);
-      ride.setCanceledAt(LocalDateTime.now());
+      ride.setCanceledAt(TimeHelper.now());
       ride.setStatus(RideStatus.CANCELED);
       ride = rideRepository.save(ride);
       Optional.ofNullable(ride.getDriverId()).ifPresent(driverRepository::setAvailable);
-      logger.info(String.format("Ride cancelled. rideId=%s", ride.getId()));
+      logger.info("Ride cancelled. rideId=%s".formatted(ride.getId()));
 
       return new RideCanceledDto(
           ride.getId(), ride.getPassengerId(), ride.getDriverId(), ride.getPickup(), ride.getDropOff(),
           ride.getDistance(), ride.getFare(), ride.getRequestedAt(), ride.getCanceledAt()
       );
     } catch (Exception e) {
-      logger.error(String.format("Failed to cancel ride. rideId=%s, error=%s", rideId, e.getMessage()), e);
+      logger.error("Failed to cancel ride. rideId=%s, error=%s".formatted(rideId, e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public Ride getRide(UUID rideId) throws NotFoundException {
-    logger.info(String.format("Getting ride detail. rideId=%s", rideId));
+    logger.info("Getting ride detail. rideId=%s".formatted(rideId));
     try {
       validationService.checkIdentifier(rideId, Ride.class);
       Ride ride = rideRepository.findById(rideId).orElseThrow(() -> new NotFoundException(Ride.class, rideId));
-      logger.info(String.format("Ride detail retrieved. rideId=%s", rideId));
+      logger.info("Ride detail retrieved. rideId=%s".formatted(rideId));
       return ride;
     } catch (Exception e) {
-      logger.error(String.format("Failed to get ride detail. rideId=%s, error=%s", rideId, e.getMessage()), e);
+      logger.error("Failed to get ride detail. rideId=%s, error=%s".formatted(rideId, e.getMessage()), e);
       throw e;
     }
   }
 
   @Override
   public List<Ride> getHistoryOfPassenger(UUID passengerId) {
-    logger.info(String.format("Getting ride history for passengerId=%s", passengerId));
+    logger.info("Getting ride history for passengerId=%s".formatted(passengerId));
     List<Ride> rides = rideRepository.findAllByPassengerId(passengerId);
-    logger.info(String.format("Found %d rides for passengerId=%s", rides.size(), passengerId));
+    logger.info("Found %d rides for passengerId=%s".formatted(rides.size(), passengerId));
     return rides;
   }
 
   @Override
   public List<Ride> getHistoryOfDriver(UUID driverId) {
-    logger.info(String.format("Getting ride history for driverId=%s", driverId));
+    logger.info("Getting ride history for driverId=%s".formatted(driverId));
     List<Ride> rides = rideRepository.findAllByDriverId(driverId);
-    logger.info(String.format("Found %d rides for driverId=%s", rides.size(), driverId));
+    logger.info("Found %d rides for driverId=%s".formatted(rides.size(), driverId));
     return rides;
   }
 

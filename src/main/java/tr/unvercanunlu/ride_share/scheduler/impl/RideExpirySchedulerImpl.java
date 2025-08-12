@@ -6,6 +6,7 @@ import tr.unvercanunlu.ride_share.core.log.Logger;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.helper.LoggerFactory;
+import tr.unvercanunlu.ride_share.helper.TimeHelper;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 public class RideExpirySchedulerImpl extends AbstractScheduler {
@@ -18,7 +19,7 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
 
   @Override
   protected void job() {
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = TimeHelper.now();
     int expiredCount = 0;
 
     try {
@@ -34,17 +35,17 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
         ride.setStatus(RideStatus.EXPIRED);
         rideRepository.save(ride);
         expiredCount++;
-        logger.info(String.format("Ride expired. rideId=%s", ride.getId()));
+        logger.info("Ride expired. rideId=%s".formatted(ride.getId()));
       }
 
       if (expiredCount > 0) {
-        logger.info(String.format("Expired %d rides at %s.", expiredCount, now));
+        logger.info("Expired %d rides at %s.".formatted(expiredCount, now));
       } else {
-        logger.debug(String.format("No rides expired at %s.", now));
+        logger.debug("No rides expired at %s.".formatted(now));
       }
 
     } catch (Exception e) {
-      logger.error(String.format("Error occurred while running RideExpiryScheduler: %s", e.getMessage()), e);
+      logger.error("Error occurred while running RideExpiryScheduler: %s".formatted(e.getMessage()), e);
     }
   }
 

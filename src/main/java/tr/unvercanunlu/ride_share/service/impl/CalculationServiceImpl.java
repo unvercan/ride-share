@@ -16,17 +16,17 @@ public class CalculationServiceImpl implements CalculationService {
   @Override
   public BigDecimal calculatePrice(double distance) {
     if (distance < 0) {
-      logger.error(String.format("Invalid distance for price calculation: distance=%.2f", distance));
+      logger.error("Invalid distance for price calculation: distance=%.2f".formatted(distance));
       throw new IllegalArgumentException("Distance cannot be negative: %.2f".formatted(distance));
     }
 
     try {
       BigDecimal price = BASE_FARE.add(FARE_PER_KM.multiply(BigDecimal.valueOf(distance))).setScale(2, RoundingMode.HALF_UP);
-      logger.info(String.format("Calculated price for ride: distance=%.2f, price=%s", distance, price));
+      logger.info("Calculated price for ride: distance=%.2f, price=%s".formatted(distance, price));
       return price;
 
     } catch (Exception e) {
-      logger.error(String.format("Error calculating price: distance=%.2f, error=%s", distance, e.getMessage()), e);
+      logger.error("Error calculating price: distance=%.2f, error=%s".formatted(distance, e.getMessage()), e);
       throw e;
     }
   }
