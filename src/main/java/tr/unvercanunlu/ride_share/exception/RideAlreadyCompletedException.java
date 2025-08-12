@@ -11,7 +11,6 @@ public class RideAlreadyCompletedException extends RideSharingBaseException {
 
   public RideAlreadyCompletedException(UUID rideId) {
     super(ErrorMessage.RIDE_ALREADY_COMPLETED, rideId);
-
     this.rideId = rideId;
   }
 

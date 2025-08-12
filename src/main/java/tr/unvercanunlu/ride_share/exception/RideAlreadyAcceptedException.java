@@ -11,7 +11,6 @@ public class RideAlreadyAcceptedException extends RideSharingBaseException {
 
   public RideAlreadyAcceptedException(UUID rideId) {
     super(ErrorMessage.RIDE_ALREADY_ACCEPTED, rideId);
-
     this.rideId = rideId;
   }
 

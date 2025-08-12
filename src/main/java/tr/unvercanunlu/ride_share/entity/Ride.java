@@ -6,7 +6,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import tr.unvercanunlu.ride_share.core.BaseEntity;
+import tr.unvercanunlu.ride_share.core.entity.BaseEntity;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 @ToString

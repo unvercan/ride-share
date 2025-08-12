@@ -9,6 +9,6 @@ public interface PassengerService {
 
   Passenger register(RegisterPassengerDto request);
 
-  Passenger getDetail(UUID passengerId) throws NotFoundException;
+  Passenger getPassenger(UUID passengerId) throws NotFoundException;
 
 }

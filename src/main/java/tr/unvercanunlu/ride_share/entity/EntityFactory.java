@@ -2,20 +2,22 @@ package tr.unvercanunlu.ride_share.entity;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tr.unvercanunlu.ride_share.core.log.Logger;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
-import tr.unvercanunlu.ride_share.helper.LogHelper;
+import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EntityFactory {
 
+  private static final Logger logger = LoggerFactory.getLogger(EntityFactory.class);
+
   public static Driver from(RegisterDriverDto request) {
     if (request == null) {
-      LogHelper.error(EntityFactory.class, "RegisterDriverDto is null!");
-
+      logger.error("RegisterDriverDto is null!");
       throw new IllegalArgumentException("RegisterDriverDto cannot be null");
     }
 
@@ -27,16 +29,13 @@ public class EntityFactory {
     driver.setPlate(request.plate());
     driver.setStatus(DriverStatus.OFFLINE);
 
-    LogHelper.info(EntityFactory.class,
-        String.format("New Driver entity created: driver=%s", driver));
-
+    logger.info(String.format("New Driver entity created: driver=%s", driver));
     return driver;
   }
 
   public static Passenger from(RegisterPassengerDto request) {
     if (request == null) {
-      LogHelper.error(EntityFactory.class, "RegisterPassengerDto is null!");
-
+      logger.error("RegisterPassengerDto is null!");
       throw new IllegalArgumentException("RegisterPassengerDto cannot be null");
     }
 
@@ -46,16 +45,13 @@ public class EntityFactory {
     passenger.setEmail(request.email());
     passenger.setPhone(request.phone());
 
-    LogHelper.info(EntityFactory.class,
-        String.format("New Passenger entity created: passenger=%s", passenger));
-
+    logger.info(String.format("New Passenger entity created: passenger=%s", passenger));
     return passenger;
   }
 
   public static Ride from(RequestRideDto request) {
     if (request == null) {
-      LogHelper.error(EntityFactory.class, "RequestRideDto is null!");
-
+      logger.error("RequestRideDto is null!");
       throw new IllegalArgumentException("RequestRideDto cannot be null");
     }
 
@@ -66,9 +62,7 @@ public class EntityFactory {
     ride.setDropOff(request.dropOff());
     ride.setStatus(RideStatus.REQUESTED);
 
-    LogHelper.info(EntityFactory.class,
-        String.format("New Ride entity created: ride=%s", ride));
-
+    logger.info(String.format("New Ride entity created: ride=%s", ride));
     return ride;
   }
 

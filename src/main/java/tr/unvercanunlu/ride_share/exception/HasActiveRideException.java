@@ -15,7 +15,6 @@ public class HasActiveRideException extends RideSharingBaseException {
 
   public HasActiveRideException(Class<? extends Person> person, UUID id) {
     super(ErrorMessage.HAS_ACTIVE_RIDE, person.getSimpleName(), id);
-
     this.id = id;
     this.person = person;
   }

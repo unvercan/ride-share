@@ -3,7 +3,7 @@ package tr.unvercanunlu.ride_share.exception;
 import java.util.UUID;
 import lombok.Getter;
 import tr.unvercanunlu.ride_share.config.ErrorMessage;
-import tr.unvercanunlu.ride_share.core.BaseEntity;
+import tr.unvercanunlu.ride_share.core.entity.BaseEntity;
 
 public class NotFoundException extends RideSharingBaseException {
 
@@ -15,7 +15,6 @@ public class NotFoundException extends RideSharingBaseException {
 
   public NotFoundException(Class<? extends BaseEntity<?>> entity, UUID id) {
     super(ErrorMessage.NOT_FOUND, entity.getSimpleName(), id);
-
     this.id = id;
     this.entity = entity;
   }

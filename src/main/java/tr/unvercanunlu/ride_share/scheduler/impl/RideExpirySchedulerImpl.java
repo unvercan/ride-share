@@ -2,12 +2,15 @@ package tr.unvercanunlu.ride_share.scheduler.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import tr.unvercanunlu.ride_share.core.log.Logger;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.helper.LogHelper;
+import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
 public class RideExpirySchedulerImpl extends AbstractScheduler {
+
+  private static final Logger logger = LoggerFactory.getLogger(RideExpirySchedulerImpl.class);
 
   public RideExpirySchedulerImpl(RideRepository rideRepository) {
     super(rideRepository);
@@ -16,11 +19,10 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
   @Override
   protected void job() {
     LocalDateTime now = LocalDateTime.now();
-
     int expiredCount = 0;
 
     try {
-      List<Ride> expiredRides = rideRepository.getAll()
+      List<Ride> expiredRides = rideRepository.findAll()
           .stream()
           .filter(ride -> ride != null && ride.getStatus() != null && ride.getRequestedAt() != null)
           .filter(ride -> ride.getStatus().equals(RideStatus.REQUESTED))
@@ -30,26 +32,19 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
       for (Ride ride : expiredRides) {
         ride.setExpiredAt(now);
         ride.setStatus(RideStatus.EXPIRED);
-
         rideRepository.save(ride);
-
         expiredCount++;
-
-        LogHelper.info(this.getClass(),
-            String.format("Ride expired. rideId=%s", ride.getId()));
+        logger.info(String.format("Ride expired. rideId=%s", ride.getId()));
       }
 
       if (expiredCount > 0) {
-        LogHelper.info(this.getClass(),
-            String.format("Expired %d rides at %s.", expiredCount, now));
+        logger.info(String.format("Expired %d rides at %s.", expiredCount, now));
       } else {
-        LogHelper.debug(this.getClass(),
-            String.format("No rides expired at %s.", now));
+        logger.debug(String.format("No rides expired at %s.", now));
       }
 
     } catch (Exception e) {
-      LogHelper.error(this.getClass(),
-          String.format("Error occurred while running RideExpiryScheduler: %s", e.getMessage()), e);
+      logger.error(String.format("Error occurred while running RideExpiryScheduler: %s", e.getMessage()), e);
     }
   }
 

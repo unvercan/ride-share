@@ -11,7 +11,6 @@ public class DriverMissingException extends RideSharingBaseException {
 
   public DriverMissingException(UUID rideId) {
     super(ErrorMessage.DRIVER_MISSING, rideId);
-
     this.rideId = rideId;
   }
 

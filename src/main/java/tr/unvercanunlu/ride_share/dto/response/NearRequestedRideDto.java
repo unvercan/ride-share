@@ -16,7 +16,7 @@ public record NearRequestedRideDto(
     LocalDateTime requestEndAt,
     Location current,
     double distanceToPickup,
-    Estimation estimation
+    EstimationDto estimation
 ) {
 
 }

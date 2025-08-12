@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 public class ErrorMessage {
 
   public static final String NOT_FOUND = "%s %s not found!";
-  public static final String HAS_ACTIVE_RIDE = "An active ride for %s %s!";
+  public static final String HAS_ACTIVE_RIDE = "Active ride exists for %s id=%s";
   public static final String DRIVER_UNAVAILABLE = "Driver %s unavailable!";
   public static final String DRIVER_MISSING = "Driver missing for ride %s!";
   public static final String IDENTIFIER_MISSING = "ID missing for %s!";

@@ -14,7 +14,7 @@ public record RideRequestedDto(
     BigDecimal fare,
     LocalDateTime requestedAt,
     LocalDateTime requestEndAt,
-    Estimation estimation
+    EstimationDto estimation
 ) {
 
 }

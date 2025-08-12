@@ -19,7 +19,6 @@ public class NotExpectedRideStatusException extends RideSharingBaseException {
 
   public NotExpectedRideStatusException(UUID rideId, Set<RideStatus> expected, RideStatus actual) {
     super(ErrorMessage.RIDE_STATUS_NOT_EXPECTED, rideId, expected, actual);
-
     this.rideId = rideId;
     this.expected = expected;
     this.actual = actual;

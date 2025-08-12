@@ -1,20 +1,20 @@
 package tr.unvercanunlu.ride_share.dao.impl;
 
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.core.impl.InMemoryDaoImpl;
+import tr.unvercanunlu.ride_share.core.dao.impl.InMemoryDaoImpl;
+import tr.unvercanunlu.ride_share.core.log.Logger;
 import tr.unvercanunlu.ride_share.dao.PassengerRepository;
 import tr.unvercanunlu.ride_share.entity.Passenger;
-import tr.unvercanunlu.ride_share.helper.LogHelper;
+import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 
 public class PassengerRepositoryImpl extends InMemoryDaoImpl<Passenger> implements PassengerRepository {
 
+  private static final Logger logger = LoggerFactory.getLogger(PassengerRepositoryImpl.class);
+
   @Override
-  public boolean checkExists(UUID passengerId) {
+  public boolean existsById(UUID passengerId) {
     boolean exists = (passengerId != null) && entities.containsKey(passengerId);
-
-    LogHelper.debug(this.getClass(),
-        String.format("Checked existence for passengerId=%s. Exists=%b", passengerId, exists));
-
+    logger.debug(String.format("Checked existence for passengerId=%s. Exists=%b", passengerId, exists));
     return exists;
   }
 

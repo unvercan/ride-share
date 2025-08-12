@@ -12,10 +12,10 @@ public interface DriverService {
 
   Driver updateLocation(UpdateLocationDto request);
 
-  Driver makeOffline(UUID driverId);
+  Driver setOffline(UUID driverId);
 
-  Driver makeAvailable(UUID driverId);
+  Driver setAvailable(UUID driverId);
 
-  Driver getDetail(UUID driverId) throws NotFoundException;
+  Driver getDriver(UUID driverId) throws NotFoundException;
 
 }

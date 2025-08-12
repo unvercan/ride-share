@@ -17,23 +17,23 @@ import tr.unvercanunlu.ride_share.exception.NotFoundException;
 
 public interface RideService {
 
-  RideRequestedDto request(RequestRideDto request);
+  RideRequestedDto requestRide(RequestRideDto request);
 
   List<NearRequestedRideDto> findNearestRequestedRides(Location current);
 
-  RideAcceptedDto accept(AcceptRideDto request);
+  RideAcceptedDto acceptRide(AcceptRideDto request);
 
-  DriverApprovedDto approveDriver(UUID rideId);
+  DriverApprovedDto approveAssignedDriver(UUID rideId);
 
-  RideRequestedDto disapproveDriver(UUID rideId);
+  RideRequestedDto rejectAssignedDriver(UUID rideId);
 
-  PassengerPickupDto pickupPassenger(UUID rideId);
+  PassengerPickupDto startTrip(UUID rideId);
 
-  RideCompletedDto complete(UUID rideId);
+  RideCompletedDto completeTrip(UUID rideId);
 
-  RideCanceledDto cancel(UUID rideId);
+  RideCanceledDto cancelRide(UUID rideId);
 
-  Ride getDetail(UUID rideId) throws NotFoundException;
+  Ride getRide(UUID rideId) throws NotFoundException;
 
   List<Ride> getHistoryOfPassenger(UUID passengerId);
 

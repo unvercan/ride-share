@@ -11,7 +11,6 @@ public class DriverUnavailableException extends RideSharingBaseException {
 
   public DriverUnavailableException(UUID driverId) {
     super(ErrorMessage.DRIVER_UNAVAILABLE, driverId);
-
     this.driverId = driverId;
   }
 

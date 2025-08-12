@@ -1,7 +1,7 @@
 package tr.unvercanunlu.ride_share.service;
 
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.core.BaseEntity;
+import tr.unvercanunlu.ride_share.core.entity.BaseEntity;
 import tr.unvercanunlu.ride_share.entity.Ride;
 import tr.unvercanunlu.ride_share.exception.DriverMissingException;
 import tr.unvercanunlu.ride_share.exception.DriverUnavailableException;
