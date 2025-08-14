@@ -17,15 +17,13 @@ public class CalculationServiceImpl implements CalculationService {
       log.error("Invalid distance for price calculation: distance={}", distance);
       throw new IllegalArgumentException("Distance cannot be negative: distance=%.2f".formatted(distance));
     }
-
     try {
       BigDecimal price = BASE_FARE.add(FARE_PER_KM.multiply(BigDecimal.valueOf(distance))).setScale(2, RoundingMode.HALF_UP);
       log.info("Calculated price for ride: distance={}, price={}", distance, price);
       return price;
-
-    } catch (Exception e) {
-      log.error("Error calculating price: distance={}, error={}", distance, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Error calculating price: distance={}", distance, ex);
+      throw ex;
     }
   }
 

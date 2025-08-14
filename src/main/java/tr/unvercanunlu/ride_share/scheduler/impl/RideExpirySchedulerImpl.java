@@ -19,15 +19,12 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
   protected void job() {
     LocalDateTime now = TimeHelper.now();
     int expiredCount = 0;
-
     try {
       List<Ride> expiredRides = rideRepository.findAll()
           .stream()
-          .filter(ride -> ride != null && ride.getStatus() != null && ride.getRequestedAt() != null)
-          .filter(ride -> ride.getStatus().equals(RideStatus.REQUESTED))
+          .filter(ride -> RideStatus.REQUESTED.equals(ride.getStatus()))
           .filter(ride -> ride.getRequestEndAt().isBefore(now))
           .toList();
-
       for (Ride ride : expiredRides) {
         ride.setExpiredAt(now);
         ride.setStatus(RideStatus.EXPIRED);
@@ -35,15 +32,13 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
         expiredCount++;
         log.info("Ride expired. rideId={}", ride.getId());
       }
-
       if (expiredCount > 0) {
         log.info("Expired {} rides at {}.", expiredCount, now);
       } else {
         log.debug("No rides expired at {}.", now);
       }
-
-    } catch (Exception e) {
-      log.error("Error occurred while running RideExpiryScheduler: {}", e.getMessage(), e);
+    } catch (Exception ex) {
+      log.error("Error occurred while running RideExpiryScheduler!", ex);
     }
   }
 

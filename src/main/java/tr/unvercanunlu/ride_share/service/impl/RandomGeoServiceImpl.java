@@ -16,28 +16,26 @@ public class RandomGeoServiceImpl implements GeoService {
   @Override
   public double calculateDistance(Location start, Location end) {
     log.info("Calculating distance: start={}, end={}", start, end);
-
     try {
       double distance = getRandom().nextInt(3, 50);
       log.info("Distance calculated: start={}, end={}, distance={}", start, end, distance);
       return distance;
-    } catch (Exception e) {
-      log.error("Failed to calculate distance: start={}, end={}, error={}", start, end, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to calculate distance: start={}, end={}", start, end, ex);
+      throw ex;
     }
   }
 
   @Override
   public int estimateDuration(Location start, Location end) {
     log.info("Estimating duration: start={}, end={}", start, end);
-
     try {
       int duration = getRandom().nextInt(3, 50);
       log.info("Duration estimated: start={}, end={}, duration={}", start, end, duration);
       return duration;
-    } catch (Exception e) {
-      log.error("Failed to estimate duration: start={}, end={}, error={}", start, end, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to estimate duration: start={}, end={}", start, end, ex);
+      throw ex;
     }
   }
 

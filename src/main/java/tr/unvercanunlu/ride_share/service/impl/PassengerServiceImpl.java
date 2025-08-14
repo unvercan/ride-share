@@ -26,9 +26,9 @@ public class PassengerServiceImpl implements PassengerService {
       passenger = passengerRepository.save(passenger);
       log.info("Passenger registered: email={} id={}", request.email(), passenger.getId());
       return passenger;
-    } catch (Exception e) {
-      log.error("Failed to register passenger: error={}", e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to register passenger!", ex);
+      throw ex;
     }
   }
 
@@ -40,9 +40,9 @@ public class PassengerServiceImpl implements PassengerService {
       Passenger passenger = passengerRepository.findById(passengerId).orElseThrow(() -> new NotFoundException(Passenger.class, passengerId));
       log.info("Passenger detail retrieved: passengerId={}", passengerId);
       return passenger;
-    } catch (Exception e) {
-      log.error("Failed to retrieve passenger detail: passengerId={} error={}", passengerId, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to retrieve passenger detail: passengerId={}", passengerId, ex);
+      throw ex;
     }
   }
 

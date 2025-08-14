@@ -46,18 +46,16 @@ public abstract class AbstractScheduler implements Scheduler {
     if (running) {
       log.info("Stopping Scheduler.");
       scheduler.shutdown();
-
       try {
         if (!scheduler.awaitTermination(TERMINATION_TIMEOUT.toSeconds(), TimeUnit.SECONDS)) {
           log.info("Scheduler did not terminate in time, forcing shutdownNow.");
           scheduler.shutdownNow();
         }
-      } catch (InterruptedException e) {
-        log.error("Interrupted while shutting down scheduler", e);
+      } catch (InterruptedException ex) {
+        log.error("Interrupted while shutting down scheduler", ex);
         scheduler.shutdownNow();
         Thread.currentThread().interrupt();
       }
-
       running = false;
       log.info("Scheduler stopped.");
     } else {

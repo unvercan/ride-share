@@ -31,7 +31,6 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkNoActiveRideForDriver(UUID driverId) throws HasActiveRideException {
     checkIdentifier(driverId, Driver.class);
-
     if (rideRepository.existsActiveByDriverId(driverId)) {
       log.error("Driver has active ride: driverId={}", driverId);
       throw new HasActiveRideException(Driver.class, driverId);
@@ -41,7 +40,6 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkNoActiveRideForPassenger(UUID passengerId) throws HasActiveRideException {
     checkIdentifier(passengerId, Passenger.class);
-
     if (rideRepository.existsActiveByPassengerId(passengerId)) {
       log.error("Passenger has active ride: passengerId={}", passengerId);
       throw new HasActiveRideException(Passenger.class, passengerId);
@@ -51,7 +49,6 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkDriverAvailable(UUID driverId) throws DriverUnavailableException {
     checkIdentifier(driverId, Driver.class);
-
     if (!driverRepository.isAvailable(driverId)) {
       log.error("Driver unavailable: driverId={}", driverId);
       throw new DriverUnavailableException(driverId);
@@ -69,7 +66,6 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkPassengerExists(UUID passengerId) throws NotFoundException {
     checkIdentifier(passengerId, Passenger.class);
-
     if (!passengerRepository.existsById(passengerId)) {
       log.error("Passenger not found: passengerId={}", passengerId);
       throw new NotFoundException(Passenger.class, passengerId);
@@ -95,7 +91,6 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkDriverExists(UUID driverId) throws NotFoundException {
     checkIdentifier(driverId, Driver.class);
-
     if (!driverRepository.existsById(driverId)) {
       log.error("Driver not found: driverId={}", driverId);
       throw new NotFoundException(Driver.class, driverId);

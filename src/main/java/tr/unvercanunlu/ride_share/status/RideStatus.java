@@ -32,7 +32,6 @@ public enum RideStatus {
     map.put(COMPLETED, Collections.emptySet());
     map.put(CANCELED, Collections.emptySet());
     map.put(EXPIRED, Collections.emptySet());
-
     TRANSITIONS = Collections.unmodifiableMap(map);
   }
 
@@ -43,7 +42,6 @@ public enum RideStatus {
     if ((next != null) && TRANSITIONS.containsKey(this)) {
       return TRANSITIONS.get(this).contains(next);
     }
-
     return false;
   }
 

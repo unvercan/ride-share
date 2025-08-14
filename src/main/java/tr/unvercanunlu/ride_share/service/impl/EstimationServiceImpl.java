@@ -19,51 +19,45 @@ public class EstimationServiceImpl implements EstimationService {
   @Override
   public EstimationDto estimate(Location pickup, Location dropOff) {
     log.info("Estimating duration: pickup={}, dropOff={}", pickup, dropOff);
-
     try {
       int duration = geoService.estimateDuration(pickup, dropOff);
       log.info("Estimated duration: {} minutes", duration);
       return new EstimationDto(duration, null, null, null);
-    } catch (Exception e) {
-      log.error("Failed to estimate duration: pickup={}, dropOff={}, error={}", pickup, dropOff, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to estimate duration: pickup={}, dropOff={}", pickup, dropOff, ex);
+      throw ex;
     }
   }
 
   @Override
   public EstimationDto estimate(Location pickup, Location dropOff, Location current, LocalDateTime from) {
     log.info("Estimating full trip: pickup={}, dropOff={}, current={}, from={}", pickup, dropOff, current, from);
-
     try {
       int duration = geoService.estimateDuration(pickup, dropOff);
       int durationToPickup = geoService.estimateDuration(current, pickup);
       LocalDateTime pickupAt = from.plusMinutes(durationToPickup);
       LocalDateTime pickupEndAt = pickupAt.plus(MAX_WAIT);
       LocalDateTime completedAt = pickupAt.plusMinutes(duration);
-
-      log.info("Estimation result: duration={}, pickupAt={}, pickupEndAt={}, completedAt={}"
-          , duration, pickupAt, pickupEndAt, completedAt);
+      log.info("Estimation result: duration={}, pickupAt={}, pickupEndAt={}, completedAt={}",
+          duration, pickupAt, pickupEndAt, completedAt);
       return new EstimationDto(duration, pickupAt, pickupEndAt, completedAt);
-    } catch (Exception e) {
-      log.error("Failed to estimate full trip: pickup={}, dropOff={}, current={}, from={}, error={}"
-          , pickup, dropOff, current, from, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to estimate full trip: pickup={}, dropOff={}, current={}, from={}", pickup, dropOff, current, from, ex);
+      throw ex;
     }
   }
 
   @Override
   public EstimationDto estimate(Location pickup, Location dropOff, LocalDateTime pickupAt) {
     log.info("Estimating completion: pickup={}, dropOff={}, pickupAt={}", pickup, dropOff, pickupAt);
-
     try {
       int estimatedDuration = geoService.estimateDuration(pickup, dropOff);
       LocalDateTime estimatedCompletedAt = pickupAt.plusMinutes(estimatedDuration);
       log.info("Estimation result: estimatedDuration={}, estimatedCompletedAt={}", estimatedDuration, estimatedCompletedAt);
       return new EstimationDto(estimatedDuration, null, null, estimatedCompletedAt);
-    } catch (Exception e) {
-      log.error("Failed to estimate completion: pickup={}, dropOff={}, pickupAt={}, error={}"
-          , pickup, dropOff, pickupAt, e.getMessage(), e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Failed to estimate completion: pickup={}, dropOff={}, pickupAt={}", pickup, dropOff, pickupAt, ex);
+      throw ex;
     }
   }
 

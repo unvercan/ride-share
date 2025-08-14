@@ -25,14 +25,12 @@ public class PickupExpirySchedulerImpl extends AbstractScheduler {
   protected void job() {
     LocalDateTime now = TimeHelper.now();
     int expiredCount = 0;
-
     try {
       List<Ride> ridesToExpire = rideRepository.findAll()
           .stream()
-          .filter(ride -> ride != null && ride.getStatus() == RideStatus.APPROVED)
+          .filter(ride -> ride.getStatus() == RideStatus.APPROVED)
           .filter(ride -> ride.getPickupEndAt() != null && ride.getPickupEndAt().isBefore(now))
           .toList();
-
       for (Ride ride : ridesToExpire) {
         UUID previousDriverId = ride.getDriverId();
         ride.setExpiredAt(now);
@@ -42,15 +40,13 @@ public class PickupExpirySchedulerImpl extends AbstractScheduler {
         expiredCount++;
         log.info("Ride pickup expired. rideId={}", ride.getId());
       }
-
       if (expiredCount > 0) {
         log.info("Expired {} rides stuck in pickup at {}.", expiredCount, now);
       } else {
         log.debug("No rides expired in pickup phase at {}.", now);
       }
-
-    } catch (Exception e) {
-      log.error("Error occurred in PickupExpiryScheduler: {}", e.getMessage(), e);
+    } catch (Exception ex) {
+      log.error("Error occurred in PickupExpiryScheduler", ex);
     }
   }
 
