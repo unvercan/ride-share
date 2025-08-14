@@ -2,16 +2,14 @@ package tr.unvercanunlu.ride_share.scheduler.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import tr.unvercanunlu.ride_share.core.log.Logger;
+import lombok.extern.slf4j.Slf4j;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.helper.TimeHelper;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
+@Slf4j
 public class RideExpirySchedulerImpl extends AbstractScheduler {
-
-  private static final Logger logger = LoggerFactory.getLogger(RideExpirySchedulerImpl.class);
 
   public RideExpirySchedulerImpl(RideRepository rideRepository) {
     super(rideRepository);
@@ -35,17 +33,17 @@ public class RideExpirySchedulerImpl extends AbstractScheduler {
         ride.setStatus(RideStatus.EXPIRED);
         rideRepository.save(ride);
         expiredCount++;
-        logger.info("Ride expired. rideId=%s".formatted(ride.getId()));
+        log.info("Ride expired. rideId={}", ride.getId());
       }
 
       if (expiredCount > 0) {
-        logger.info("Expired %d rides at %s.".formatted(expiredCount, now));
+        log.info("Expired {} rides at {}.", expiredCount, now);
       } else {
-        logger.debug("No rides expired at %s.".formatted(now));
+        log.debug("No rides expired at {}.", now);
       }
 
     } catch (Exception e) {
-      logger.error("Error occurred while running RideExpiryScheduler: %s".formatted(e.getMessage()), e);
+      log.error("Error occurred while running RideExpiryScheduler: {}", e.getMessage(), e);
     }
   }
 

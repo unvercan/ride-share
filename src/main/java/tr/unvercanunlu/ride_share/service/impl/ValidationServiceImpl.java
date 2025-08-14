@@ -2,8 +2,8 @@ package tr.unvercanunlu.ride_share.service.impl;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tr.unvercanunlu.ride_share.core.entity.BaseEntity;
-import tr.unvercanunlu.ride_share.core.log.Logger;
 import tr.unvercanunlu.ride_share.dao.DriverRepository;
 import tr.unvercanunlu.ride_share.dao.PassengerRepository;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
@@ -17,14 +17,12 @@ import tr.unvercanunlu.ride_share.exception.IdentifierMissingException;
 import tr.unvercanunlu.ride_share.exception.NotExpectedRideStatusException;
 import tr.unvercanunlu.ride_share.exception.NotFoundException;
 import tr.unvercanunlu.ride_share.exception.RideAlreadyAcceptedException;
-import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.service.ValidationService;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ValidationServiceImpl implements ValidationService {
-
-  private static final Logger logger = LoggerFactory.getLogger(ValidationServiceImpl.class);
 
   private final RideRepository rideRepository;
   private final DriverRepository driverRepository;
@@ -35,7 +33,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(driverId, Driver.class);
 
     if (rideRepository.existsActiveByDriverId(driverId)) {
-      logger.error("Driver has active ride: driverId=%s".formatted(driverId));
+      log.error("Driver has active ride: driverId={}", driverId);
       throw new HasActiveRideException(Driver.class, driverId);
     }
   }
@@ -45,7 +43,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(passengerId, Passenger.class);
 
     if (rideRepository.existsActiveByPassengerId(passengerId)) {
-      logger.error("Passenger has active ride: passengerId=%s".formatted(passengerId));
+      log.error("Passenger has active ride: passengerId={}", passengerId);
       throw new HasActiveRideException(Passenger.class, passengerId);
     }
   }
@@ -55,7 +53,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(driverId, Driver.class);
 
     if (!driverRepository.isAvailable(driverId)) {
-      logger.error("Driver unavailable: driverId=%s".formatted(driverId));
+      log.error("Driver unavailable: driverId={}", driverId);
       throw new DriverUnavailableException(driverId);
     }
   }
@@ -63,7 +61,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkIdentifier(UUID id, Class<? extends BaseEntity<?>> entityClass) throws IdentifierMissingException {
     if (id == null) {
-      logger.error("Identifier is null for entity: %s".formatted(entityClass.getSimpleName()));
+      log.error("Identifier is null for entity: {}", entityClass.getSimpleName());
       throw new IdentifierMissingException(entityClass);
     }
   }
@@ -73,7 +71,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(passengerId, Passenger.class);
 
     if (!passengerRepository.existsById(passengerId)) {
-      logger.error("Passenger not found: passengerId=%s".formatted(passengerId));
+      log.error("Passenger not found: passengerId={}", passengerId);
       throw new NotFoundException(Passenger.class, passengerId);
     }
   }
@@ -81,7 +79,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkRideTransition(Ride ride, RideStatus nextStatus) throws NotExpectedRideStatusException {
     if ((ride != null) && (ride.getStatus() != null) && (nextStatus != null) && !ride.getStatus().canTransitionTo(nextStatus)) {
-      logger.error("Invalid ride status transition: rideId=%s from=%s to=%s".formatted(ride.getId(), ride.getStatus(), nextStatus));
+      log.error("Invalid ride status transition: rideId={} from={} to={}", ride.getId(), ride.getStatus(), nextStatus);
       throw new NotExpectedRideStatusException(ride.getId(), ride.getStatus().getAllowedTransitions(), nextStatus);
     }
   }
@@ -89,7 +87,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkDriverPresent(Ride ride) throws DriverMissingException {
     if ((ride != null) && (ride.getDriverId() == null)) {
-      logger.error("Driver is missing for ride: rideId=%s".formatted(ride.getId()));
+      log.error("Driver is missing for ride: rideId={}", ride.getId());
       throw new DriverMissingException(ride.getId());
     }
   }
@@ -99,7 +97,7 @@ public class ValidationServiceImpl implements ValidationService {
     checkIdentifier(driverId, Driver.class);
 
     if (!driverRepository.existsById(driverId)) {
-      logger.error("Driver not found: driverId=%s".formatted(driverId));
+      log.error("Driver not found: driverId={}", driverId);
       throw new NotFoundException(Driver.class, driverId);
     }
   }
@@ -107,7 +105,7 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void checkRideAccepted(Ride ride) throws RideAlreadyAcceptedException {
     if ((ride != null) && (ride.getDriverId() != null)) {
-      logger.error("Ride already accepted: rideId=%s".formatted(ride.getId()));
+      log.error("Ride already accepted: rideId={}", ride.getId());
       throw new RideAlreadyAcceptedException(ride.getId());
     }
   }

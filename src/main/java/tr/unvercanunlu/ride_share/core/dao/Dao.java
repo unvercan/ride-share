@@ -11,6 +11,6 @@ public interface Dao<T, K> {
 
   T save(T entity);
 
-  void deleteById(K id);
+  boolean deleteById(K id);
 
 }

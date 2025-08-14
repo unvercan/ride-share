@@ -2,22 +2,20 @@ package tr.unvercanunlu.ride_share.entity;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import tr.unvercanunlu.ride_share.core.log.Logger;
+import lombok.extern.slf4j.Slf4j;
 import tr.unvercanunlu.ride_share.dto.request.RegisterDriverDto;
 import tr.unvercanunlu.ride_share.dto.request.RegisterPassengerDto;
 import tr.unvercanunlu.ride_share.dto.request.RequestRideDto;
-import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.status.DriverStatus;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EntityFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(EntityFactory.class);
-
   public static Driver from(RegisterDriverDto request) {
     if (request == null) {
-      logger.error("RegisterDriverDto is null!");
+      log.error("RegisterDriverDto is null!");
       throw new IllegalArgumentException("RegisterDriverDto cannot be null");
     }
 
@@ -28,13 +26,13 @@ public class EntityFactory {
     driver.setPlate(request.plate());
     driver.setStatus(DriverStatus.OFFLINE);
 
-    logger.info("New Driver entity created: driver=%s".formatted(driver));
+    log.info("New Driver entity created: driver={}", driver);
     return driver;
   }
 
   public static Passenger from(RegisterPassengerDto request) {
     if (request == null) {
-      logger.error("RegisterPassengerDto is null!");
+      log.error("RegisterPassengerDto is null!");
       throw new IllegalArgumentException("RegisterPassengerDto cannot be null");
     }
 
@@ -43,13 +41,13 @@ public class EntityFactory {
     passenger.setEmail(request.email());
     passenger.setPhone(request.phone());
 
-    logger.info("New Passenger entity created: passenger=%s".formatted(passenger));
+    log.info("New Passenger entity created: passenger={}", passenger);
     return passenger;
   }
 
   public static Ride from(RequestRideDto request) {
     if (request == null) {
-      logger.error("RequestRideDto is null!");
+      log.error("RequestRideDto is null!");
       throw new IllegalArgumentException("RequestRideDto cannot be null");
     }
 
@@ -59,7 +57,7 @@ public class EntityFactory {
     ride.setDropOff(request.dropOff());
     ride.setStatus(RideStatus.REQUESTED);
 
-    logger.info("New Ride entity created: ride=%s".formatted(ride));
+    log.info("New Ride entity created: ride={}", ride);
     return ride;
   }
 

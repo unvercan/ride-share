@@ -6,66 +6,72 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import lombok.extern.slf4j.Slf4j;
 import tr.unvercanunlu.ride_share.core.dao.Dao;
 import tr.unvercanunlu.ride_share.core.entity.BaseEntity;
-import tr.unvercanunlu.ride_share.core.log.Logger;
-import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 
+@Slf4j
 public abstract class InMemoryDaoImpl<T extends BaseEntity<UUID>> implements Dao<T, UUID> {
-
-  private static final Logger logger = LoggerFactory.getLogger(InMemoryDaoImpl.class);
 
   protected final ConcurrentMap<UUID, T> entities = new ConcurrentHashMap<>();
 
   @Override
   public Optional<T> findById(UUID id) {
-    Optional<T> result = Optional.ofNullable(id).map(entities::get);
+    if (id == null) {
+      throw new IllegalArgumentException("ID missing!");
+    }
+
+    Optional<T> result = Optional.ofNullable(entities.get(id));
     if (result.isPresent()) {
-      logger.info("Entity found: id=%s, entity=%s".formatted(id, result.get()));
+      log.info("Entity found: id={}", id);
     } else {
-      logger.debug("Entity not found: id=%s".formatted(id));
+      log.debug("Entity not found: id={}", id);
     }
     return result;
   }
 
   @Override
   public List<T> findAll() {
-    logger.debug("Retrieving all entities. Count=%d".formatted(entities.size()));
+    log.debug("Retrieving all entities. Count={}", entities.size());
     return new ArrayList<>(entities.values());
   }
 
   @Override
   public T save(T entity) {
     if (entity == null) {
-      logger.error("Attempted to save null entity.");
-      return null;
+      throw new IllegalArgumentException("Entity missing!");
     }
+
     ensureId(entity);
     entities.put(entity.getId(), entity);
-    logger.info("Entity saved: id=%s, entity=%s".formatted(entity.getId(), entity));
+    log.info("Entity saved: id={}", entity.getId());
     return entity;
   }
 
   @Override
-  public void deleteById(UUID id) {
-    if (id != null) {
-      T removed = entities.remove(id);
-      if (removed != null) {
-        logger.info("Entity removed: id=%s, entity=%s".formatted(id, removed));
-      } else {
-        logger.debug("Attempted to remove entity, but not found: id=%s".formatted(id));
-      }
-    } else {
-      logger.error("Attempted to remove entity with null id.");
+  public boolean deleteById(UUID id) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID missing!");
     }
+
+    T removed = entities.remove(id);
+    if (removed != null) {
+      log.info("Entity removed: id={}", id);
+    } else {
+      log.debug("Attempted to remove entity, but not found: id={}", id);
+    }
+
+    return (removed != null);
   }
 
   private void ensureId(T entity) {
-    if ((entity != null) && (entity.getId() == null)) {
-      UUID id = UUID.randomUUID();
-      entity.setId(id);
-      logger.debug("Assigned new id to entity: id=%s, entity=%s".formatted(id, entity));
+    if (entity.getId() != null) {
+      return;
     }
+
+    UUID id = UUID.randomUUID();
+    entity.setId(id);
+    log.debug("Assigned new id to entity: id={}", id);
   }
 
 }

@@ -21,9 +21,6 @@ public enum RideStatus {
   CANCELED('X'),
   EXPIRED('E');
 
-  @Getter
-  private final char code;
-
   private static final Map<RideStatus, Set<RideStatus>> TRANSITIONS;
 
   static {
@@ -38,6 +35,9 @@ public enum RideStatus {
 
     TRANSITIONS = Collections.unmodifiableMap(map);
   }
+
+  @Getter
+  private final char code;
 
   public boolean canTransitionTo(RideStatus next) {
     if ((next != null) && TRANSITIONS.containsKey(this)) {

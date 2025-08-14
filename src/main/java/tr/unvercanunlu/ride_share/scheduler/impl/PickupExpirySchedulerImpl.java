@@ -4,17 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import tr.unvercanunlu.ride_share.core.log.Logger;
+import lombok.extern.slf4j.Slf4j;
 import tr.unvercanunlu.ride_share.dao.DriverRepository;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.helper.TimeHelper;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
+@Slf4j
 public class PickupExpirySchedulerImpl extends AbstractScheduler {
-
-  private static final Logger logger = LoggerFactory.getLogger(PickupExpirySchedulerImpl.class);
 
   private final DriverRepository driverRepository;
 
@@ -42,17 +40,17 @@ public class PickupExpirySchedulerImpl extends AbstractScheduler {
         rideRepository.save(ride);
         Optional.ofNullable(previousDriverId).ifPresent(driverRepository::setAvailable);
         expiredCount++;
-        logger.info("Ride pickup expired. rideId=%s".formatted(ride.getId()));
+        log.info("Ride pickup expired. rideId={}", ride.getId());
       }
 
       if (expiredCount > 0) {
-        logger.info("Expired %d rides stuck in pickup at %s.".formatted(expiredCount, now));
+        log.info("Expired {} rides stuck in pickup at {}.", expiredCount, now);
       } else {
-        logger.debug("No rides expired in pickup phase at %s.".formatted(now));
+        log.debug("No rides expired in pickup phase at {}.", now);
       }
 
     } catch (Exception e) {
-      logger.error("Error occurred in PickupExpiryScheduler: %s".formatted(e.getMessage()), e);
+      log.error("Error occurred in PickupExpiryScheduler: {}", e.getMessage(), e);
     }
   }
 

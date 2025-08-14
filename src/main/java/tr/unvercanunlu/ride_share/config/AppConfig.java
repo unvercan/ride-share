@@ -19,14 +19,13 @@ public class AppConfig {
   public static final Duration TERMINATION_TIMEOUT = Duration.ofSeconds(10);
   public static final Duration SCHEDULER_POLL_INTERVAL = Duration.ofMinutes(1);
 
-  // log
-  public static final boolean DEBUG_ENABLED = false;
-  public static final String LOG_FORMAT = "%s - %s: %s - %s";
-
+  // distance
   public static final double MAX_PICKUP_RADIUS_KM = 15;
 
+  // features
   public static final boolean ESTIMATION_ENABLED = true;
 
+  // states
   public static final Set<RideStatus> ACTIVE_RIDE_STATES = Set.of(
       RideStatus.REQUESTED,
       RideStatus.ACCEPTED,

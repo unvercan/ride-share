@@ -5,22 +5,20 @@ import static tr.unvercanunlu.ride_share.config.AppConfig.ACTIVE_RIDE_STATES;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import tr.unvercanunlu.ride_share.core.dao.impl.InMemoryDaoImpl;
-import tr.unvercanunlu.ride_share.core.log.Logger;
 import tr.unvercanunlu.ride_share.dao.RideRepository;
 import tr.unvercanunlu.ride_share.entity.Ride;
-import tr.unvercanunlu.ride_share.helper.LoggerFactory;
 import tr.unvercanunlu.ride_share.status.RideStatus;
 
+@Slf4j
 public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRepository {
-
-  private static final Logger logger = LoggerFactory.getLogger(RideRepositoryImpl.class);
 
   @Override
   public List<Ride> findRequestedWithinWindow(LocalDateTime windowStart, LocalDateTime windowEnd) {
-    logger.debug("Getting requested rides between %s and %s".formatted(windowStart, windowEnd));
+    log.debug("Getting requested rides between {} and {}", windowStart, windowEnd);
     if ((windowStart == null) || (windowEnd == null)) {
-      logger.error("Gap start or end is null!");
+      log.error("Gap start or end is null!");
       return List.of();
     }
 
@@ -32,16 +30,14 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> !ride.getRequestedAt().isBefore(windowStart) && !ride.getRequestedAt().isAfter(windowEnd))
         .toList();
 
-    logger.debug("Found %d requested rides in gap".formatted(rides.size()));
+    log.debug("Found {} requested rides in gap", rides.size());
     return rides;
   }
 
   @Override
   public List<Ride> findAllByDriverId(UUID driverId) {
-    logger.debug("Getting rides by driverId=%s".formatted(driverId));
     if (driverId == null) {
-      logger.error("driverId is null!");
-      return List.of();
+      throw new IllegalArgumentException("ID missing!");
     }
 
     List<Ride> rides = entities.values()
@@ -50,16 +46,14 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> driverId.equals(ride.getDriverId()))
         .toList();
 
-    logger.debug("Found %d rides for driverId=%s".formatted(rides.size(), driverId));
+    log.debug("Found {} rides for driverId={}", rides.size(), driverId);
     return rides;
   }
 
   @Override
   public List<Ride> findAllByPassengerId(UUID passengerId) {
-    logger.debug("Getting rides by passengerId=%s".formatted(passengerId));
     if (passengerId == null) {
-      logger.error("passengerId is null!");
-      return List.of();
+      throw new IllegalArgumentException("ID missing!");
     }
 
     List<Ride> rides = entities.values()
@@ -68,31 +62,37 @@ public class RideRepositoryImpl extends InMemoryDaoImpl<Ride> implements RideRep
         .filter(ride -> passengerId.equals(ride.getPassengerId()))
         .toList();
 
-    logger.debug("Found %d rides for passengerId=%s".formatted(rides.size(), passengerId));
+    log.debug("Found {} rides for passengerId={}", rides.size(), passengerId);
     return rides;
   }
 
   @Override
   public boolean existsActiveByPassengerId(UUID passengerId) {
-    boolean exists = (passengerId != null)
-        && findAllByPassengerId(passengerId)
+    if (passengerId == null) {
+      throw new IllegalArgumentException("ID missing!");
+    }
+
+    boolean exists = findAllByPassengerId(passengerId)
         .stream()
         .filter(ride -> ride.getStatus() != null)
         .anyMatch(ride -> ACTIVE_RIDE_STATES.contains(ride.getStatus()));
 
-    logger.debug("Active ride exists for passengerId=%s: %b".formatted(passengerId, exists));
+    log.debug("Active ride exists for passengerId={}: {}", passengerId, exists);
     return exists;
   }
 
   @Override
   public boolean existsActiveByDriverId(UUID driverId) {
-    boolean exists = (driverId != null)
-        && findAllByDriverId(driverId)
+    if (driverId == null) {
+      throw new IllegalArgumentException("ID missing!");
+    }
+
+    boolean exists = findAllByDriverId(driverId)
         .stream()
         .filter(ride -> ride.getStatus() != null)
         .anyMatch(ride -> ACTIVE_RIDE_STATES.contains(ride.getStatus()));
 
-    logger.debug("Active ride exists for driverId=%s: %b".formatted(driverId, exists));
+    log.debug("Active ride exists for driverId={}: {}", driverId, exists);
     return exists;
   }
 
